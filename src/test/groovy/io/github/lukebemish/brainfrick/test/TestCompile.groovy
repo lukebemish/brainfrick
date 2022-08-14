@@ -15,13 +15,17 @@ import java.nio.file.Path
 class TestCompile {
     static String MAP = """
 public class brainfrick.test.Test1
-int add(int,int)
+static public int add(int,int)
+static public int add2(int)
 """
     static String CODE = """
 "brainmap.map"
 ;{
     ;{
-        +,>++,<[->+<]>.
+        ,>+,<[->+<]>.
+    }
+    ;{
+        ,.>++.>++:.
     }
 }
 """
