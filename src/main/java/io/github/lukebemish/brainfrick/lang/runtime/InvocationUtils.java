@@ -6,16 +6,16 @@ import io.github.lukebemish.brainfrick.lang.ImproperTypeException;
 public final class InvocationUtils {
     private InvocationUtils() {}
 
-    static void checkEnough(int size, int needed) {
+    public static void checkEnough(int size, int needed) {
         if (size < needed)
             throw new BufferTooSmallException("Buffer contains "+size+" elements; "+needed+" needed.");
     }
 
-    static int asI(Object object) {
+    public static int asI(Object object) {
         return Cells.getIntValue(object);
     }
 
-    static short asS(Object obj) {
+    public static short asS(Object obj) {
         if (obj instanceof Number number)
             return number.shortValue();
         else if (obj instanceof Character character)
@@ -27,7 +27,7 @@ public final class InvocationUtils {
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not short-like.");
     }
 
-    static byte asB(Object obj) {
+    public static byte asB(Object obj) {
         if (obj instanceof Number number)
             return number.byteValue();
         else if (obj instanceof Character character)
@@ -39,7 +39,7 @@ public final class InvocationUtils {
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not byte-like.");
     }
 
-    static char asC(Object obj) {
+    public static char asC(Object obj) {
         if (obj instanceof Number number)
             return (char)number.shortValue();
         else if (obj instanceof Character character)
@@ -51,7 +51,7 @@ public final class InvocationUtils {
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not char-like.");
     }
 
-    static long asJ(Object obj) {
+    public static long asJ(Object obj) {
         if (obj instanceof Number number)
             return number.longValue();
         else if (obj instanceof Character character)
@@ -63,7 +63,7 @@ public final class InvocationUtils {
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not long-like.");
     }
 
-    static float asF(Object obj) {
+    public static float asF(Object obj) {
         if (obj instanceof Number number)
             return number.floatValue();
         else if (obj instanceof Character character)
@@ -75,7 +75,7 @@ public final class InvocationUtils {
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not float-like.");
     }
 
-    static double asD(Object obj) {
+    public static double asD(Object obj) {
         if (obj instanceof Number number)
             return number.doubleValue();
         else if (obj instanceof Character character)
@@ -87,7 +87,7 @@ public final class InvocationUtils {
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not double-like.");
     }
 
-    static boolean asZ(Object obj) {
+    public static boolean asZ(Object obj) {
         if (obj instanceof Boolean b)
             return b;
         if (obj instanceof Double d)
@@ -101,28 +101,28 @@ public final class InvocationUtils {
         }
     }
 
-    Object fromI(int i) {
+    public static Object fromI(int i) {
         return i;
     }
-    Object fromS(short s) {
+    public static Object fromS(short s) {
         return s;
     }
-    Object fromB(byte b) {
+    public static Object fromB(byte b) {
         return b;
     }
-    Object fromC(char c) {
+    public static Object fromC(char c) {
         return c;
     }
-    Object fromJ(long j) {
+    public static Object fromJ(long j) {
         return j;
     }
-    Object fromF(float f) {
+    public static Object fromF(float f) {
         return f;
     }
-    Object fromD(double d) {
+    public static Object fromD(double d) {
         return d;
     }
-    Object fromZ(boolean z) {
+    public static Object fromZ(boolean z) {
         return z;
     }
 }

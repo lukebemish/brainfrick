@@ -21,7 +21,7 @@ class BrainMap {
 
     static BrainType parseType(BrainMapParser.TypeContext ctx) {
         if (ctx instanceof BrainMapParser.ClassTypeContext) {
-            var type = new BrainClass()
+            var type = new BrainType()
             ctx.class_().target().each {
                 type.children.add(parseBrainChild(it))
             }
@@ -29,15 +29,18 @@ class BrainMap {
             type.type = new ObjectType(ctx.class_().name().collect {it.text})
             return type
         } else if (ctx instanceof BrainMapParser.InterfaceTypeContext) {
-            var type = new BrainInterface()
+            var type = new BrainType()
+            type.isinterface = true
             ctx.interface_().target().each {
                 if (it instanceof BrainMapParser.MethodContext) {
-                    type.methods.add(parseBrainMethod(it))
+                    type.children.add(parseBrainMethod(it))
+                } else if (it instanceof BrainMapParser.FieldContext) {
+                    type.children.add(parseBrainField(it))
                 } else {
                     //TODO: throw error
                 }
             }
-            type.methods.each {it.setParent(type)}
+            type.children.each {it.setParent(type)}
             type.type = new ObjectType(ctx.interface_().name().collect {it.text})
             return type
         }
@@ -82,16 +85,10 @@ class BrainMap {
 
     List<BrainType> classes = new ArrayList<>()
 
-    static trait BrainType {
+    static class BrainType {
         ObjectType type
-    }
-    
-    static class BrainClass implements BrainType {
         List<BrainChild> children = new ArrayList<>()
-    }
-
-    static class BrainInterface implements BrainType {
-        List<BrainMethod> methods = new ArrayList<>()
+        boolean isinterface = false
     }
     
     static trait BrainChild {
@@ -100,7 +97,7 @@ class BrainMap {
 
         setParent(BrainType parent) {
             this.parent = parent
-            if (parent instanceof BrainInterface) {
+            if (parent.isinterface && ((accessModifier & Opcodes.ACC_STATIC) != 0)) {
                 accessModifier |= Opcodes.ACC_ABSTRACT
             }
         }
@@ -122,12 +119,14 @@ class BrainMap {
 
     static trait BrainField extends BrainChild {
         String name
-        ReturnType type
+        ThingType type
     }
 
     static class BrainPutter implements BrainField {
+        ArgType type
     }
 
     static class BrainGetter implements BrainField {
+        ReturnType type
     }
 }
