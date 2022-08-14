@@ -241,7 +241,7 @@ class BrainMapCompiler {
             }
         }
 
-        FieldVisitor mapfield = cw.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
+        FieldVisitor mapfield = cw.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
                 BRAINMAP_FIELD, BRAINMAP_FIELD_DESC, null, null)
         mapfield.visitEnd()
 
