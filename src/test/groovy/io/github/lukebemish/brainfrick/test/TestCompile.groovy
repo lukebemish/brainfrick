@@ -22,7 +22,6 @@ private get Object someObject
 private put Object someObject
 """
     static String CODE = """
-"brainmap.map"
 ;{
     {
         +++>++.<:
