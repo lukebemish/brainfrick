@@ -7,18 +7,20 @@ package io.github.lukebemish.brainfrick.compile.grammar;
 program     : MAP* class* ;
 
 class       : DECL '{' method* '}' ;
-method      : DECL '{' code '}' ;
+method      : DECL '{' code* '}' ;
 
-code        : (cond | instr)* ;
+code        : cond | instr ;
 
-cond        : BEGIN code END ;
+cond        : BEGIN code* END ;
 
-instr       : PINCR
-            | PDECR
-            | INCR
-            | DECR
-            | PULL
-            | PUSH
+instr       : PINCR #pincr
+            | PDECR #pdecr
+            | INCR #incr
+            | DECR #decr
+            | PULL #pull
+            | PUSH #push
+            | OPERATE #operate
+            | RETURN #return
             ;
 
 MAP
@@ -36,11 +38,12 @@ DECL:       ';' ;
 OPERATE:    ':' ;
 OPEN:       '{' ;
 CLOSE:      '}' ;
+RETURN:     '/' ;
 
 MULTI_COMMENT
     : '/*' .*? '*/' -> skip ;
 UNKNOWN
-    : '.*?' -> skip ;
+    : .+? -> skip ;
 
 
 fragment StrEsc

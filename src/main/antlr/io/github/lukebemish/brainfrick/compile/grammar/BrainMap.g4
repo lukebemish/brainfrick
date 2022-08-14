@@ -5,8 +5,8 @@ package io.github.lukebemish.brainfrick.compile.grammar;
 }
 
 program     : type* ;
-type        : interface #interfaceType
-            | class #classType
+type        : modifier* interface #interfaceType
+            | modifier* class #classType
             ;
 
 interface   : INTERFACE name ('.' name)* target* ;
@@ -17,8 +17,8 @@ target      : ctor #ctorTarget
             | field #fieldTarget
             ;
 
-ctor        : modifier* NEW '(' (argName (',' argName*))? ')' ;
-method      : modifier* returnName name '(' (argName (',' argName*))? ')' ;
+ctor        : modifier* NEW '(' (argName (',' argName)*)? ')' ;
+method      : modifier* returnName name '(' (argName (',' argName)*)? ')' ;
 field       : modifier* (GET | PUT) returnName name ;
 
 modifier    : PROTECTED

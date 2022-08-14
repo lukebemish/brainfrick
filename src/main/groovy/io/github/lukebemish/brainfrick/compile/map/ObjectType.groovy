@@ -8,10 +8,12 @@ import org.objectweb.asm.Opcodes
 class ObjectType implements ArgType, ReturnType {
     final List<String> names
     final String desc
+    final String name
 
     ObjectType(List<String> names) {
         this.names = names
         this.desc = "L${names.join('/')};"
+        this.name = names.join('/')
     }
 
     @Override

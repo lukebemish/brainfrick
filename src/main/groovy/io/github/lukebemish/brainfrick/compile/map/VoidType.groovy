@@ -13,4 +13,9 @@ class VoidType implements ReturnType {
     void castAsObject(MethodVisitor mv) {
         mv.visitInsn(Opcodes.ACONST_NULL)
     }
+
+    @Override
+    void castTo(MethodVisitor mv) {
+        mv.visitInsn(Opcodes.POP)
+    }
 }

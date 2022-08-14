@@ -75,6 +75,10 @@ public class Cells {
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not integer-like.");
     }
 
+    public int asInt(int idx) {
+        return getIntValue(get(idx));
+    }
+
     public boolean isZero(int idx) {
         Object obj = get(idx);
         if (obj==null)

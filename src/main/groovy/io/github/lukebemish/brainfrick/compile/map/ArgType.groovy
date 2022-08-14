@@ -14,5 +14,4 @@ interface ArgType extends ThingType {
                 return new ObjectType(ctx.name().collect {it.text})
         }
     }
-    void castTo(MethodVisitor mv)
 }

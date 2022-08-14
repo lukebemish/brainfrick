@@ -1,267 +1,222 @@
 package io.github.lukebemish.brainfrick.compile
 
 import groovy.transform.CompileStatic
+import io.github.lukebemish.brainfrick.compile.grammar.BrainfrickParser
 import io.github.lukebemish.brainfrick.compile.map.ArgType
 import io.github.lukebemish.brainfrick.compile.map.BrainMap
-import io.github.lukebemish.brainfrick.lang.runtime.Caller
-import io.github.lukebemish.brainfrick.lang.runtime.InvocationUtils
-import org.objectweb.asm.*
+import io.github.lukebemish.brainfrick.compile.map.ObjectType
+import io.github.lukebemish.brainfrick.compile.map.PrimitiveType
+import io.github.lukebemish.brainfrick.compile.map.ThingType
+import io.github.lukebemish.brainfrick.compile.map.VoidType
+import io.github.lukebemish.brainfrick.lang.runtime.Cells
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.Label
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes
 
-import java.lang.invoke.LambdaMetafactory
+import java.nio.file.Files
+import java.nio.file.Path
 
 @CompileStatic
-class BrainMapCompiler {
-    private static final String CLINIT = "<clinit>"
-    private static final String CLINIT_DESC = "()V"
-    private static final String BRAINMAP_FIELD = "\$BRAINMAP"
-    private static final String BRAINMAP_FIELD_DESC = "[L${CALLER_NAME};"
-    private static final String OBJECT_NAME = Object.class.getName().replace('.','/')
-    private static final String CALLER_PREFIX = "\$brainfrickCaller\$"
-    private static final String CALLER_NAME = Caller.class.getName().replace('.','/')
-    private static final String LIST_NAME = List.class.name.replace('.','/')
-    private static final String CALLER_DESC = "(L${LIST_NAME};)L${OBJECT_NAME};"
-    private static final String INIT_NAME = "<init>"
-    private static final String BUFFER_UTILS_NAME = InvocationUtils.class.getName().replace('.','/')
-    private static final String CHECK_ENOUGH = "checkEnough"
-    private static final String CHECK_ENOUGH_DESC = "(II)V"
-    private static final String LAMBDAMETAFACTORY_NAME = LambdaMetafactory.class.name.replace('.','/')
-    private static final String METAFACTORY_DESC = "(Ljava/lang/invoke/MethodHandles\$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;" +
-            "Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;"
+class Compiler {
+    private static final String OBJECT_NAME = Object.class.name.replace('.','/')
 
+    BrainMap map
+    Path outdir
+    int ccounter = 0
 
-    ClassWriter cw
-    String classname
+    void parseClass(BrainfrickParser.ClassContext ctx) {
+        BrainMap.BrainType type = map.classes.get(ccounter)
+        ccounter++
 
-    private static void constantInt(MethodVisitor mv, int val) {
-        switch (val) {
-            case -1 -> mv.visitInsn(Opcodes.ICONST_M1)
-            case 0 -> mv.visitInsn(Opcodes.ICONST_0)
-            case 1 -> mv.visitInsn(Opcodes.ICONST_1)
-            case 2 -> mv.visitInsn(Opcodes.ICONST_2)
-            case 3 -> mv.visitInsn(Opcodes.ICONST_3)
-            case 4 -> mv.visitInsn(Opcodes.ICONST_4)
-            case 5 -> mv.visitInsn(Opcodes.ICONST_5)
-            default -> {
-                if (val <= Byte.MAX_VALUE && val >= Byte.MIN_VALUE)
-                    mv.visitIntInsn(Opcodes.BIPUSH, val)
-                else if (val <= Short.MAX_VALUE && val >= Short.MIN_VALUE)
-                    mv.visitIntInsn(Opcodes.SIPUSH, val)
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
+        cw.visit(Opcodes.V17, type.accessModifier, type.type.name,null,OBJECT_NAME,new String[]{})
+
+        BrainMapCompiler mapCompiler = new BrainMapCompiler()
+        mapCompiler.classname = type.type.name
+        mapCompiler.cw = cw
+
+        mapCompiler.writeBrainMap(map)
+
+        int methodCounter = 0
+        for (BrainfrickParser.MethodContext mctx : ctx.method()) {
+            BrainMap.BrainMethod method = type.children.findAll {it instanceof BrainMap.BrainMethod}.collect {(BrainMap.BrainMethod)it}.get(methodCounter)
+            methodCounter++
+            parseMethod(mctx, cw, method, type)
+        }
+
+        cw.visitEnd()
+
+        Path outpath = outdir.resolve(type.type.name+".class")
+        Files.createDirectories(outpath.getParent())
+        Files.write(outpath,cw.toByteArray())
+    }
+
+    static void parseMethod(BrainfrickParser.MethodContext ctx, ClassWriter cw, BrainMap.BrainMethod method, BrainMap.BrainType parent) {
+        MethodVisitor mv = cw.visitMethod(method.accessModifier, method.name, "("+method.args.collect {it.desc}.join("")+")"+method.out.desc,null, null)
+
+        int numArgs = method.args.size()+(method.isStatic()?0:1)
+
+        mv.visitCode()
+        mv.visitTypeInsn(Opcodes.NEW, Cells.class.name.replace('.','/'))
+        mv.visitInsn(Opcodes.DUP)
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Cells.class.name.replace('.','/'),"<init>","()V",false)
+        mv.visitVarInsn(Opcodes.ASTORE,numArgs)
+        mv.visitInsn(Opcodes.ICONST_0)
+        mv.visitVarInsn(Opcodes.ISTORE,numArgs+1)
+        mv.visitTypeInsn(Opcodes.NEW, ArrayList.class.name.replace('.','/'))
+        mv.visitInsn(Opcodes.DUP)
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, ArrayList.class.name.replace('.','/'),"<init>","()V",false)
+        mv.visitVarInsn(Opcodes.ASTORE,numArgs+2)
+        mv.visitTypeInsn(Opcodes.NEW, ArrayList.class.name.replace('.','/'))
+        mv.visitInsn(Opcodes.DUP)
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, ArrayList.class.name.replace('.','/'),"<init>","()V",false)
+        mv.visitVarInsn(Opcodes.ASTORE,numArgs+3)
+
+        for (int i = 0; i < numArgs; i++) {
+            mv.visitVarInsn(Opcodes.ALOAD, numArgs + 3)
+            ArgType arg
+            if (!method.isStatic()) {
+                if (i==0)
+                    arg = parent.type
                 else
-                    mv.visitLdcInsn(val)
-            }
-        }
-    }
-
-    static void writeBrainMethod(BrainMap.BrainMethod method, MethodVisitor mv, BrainMap.BrainType parent) {
-        mv.visitCode()
-
-        boolean isinterface = parent.isinterface
-
-        StringBuilder callDesc = new StringBuilder("(")
-        method.args.each {callDesc.append(it.desc)}
-        callDesc.append(')')
-        callDesc.append(method.out.desc)
-
-        int size = method.args.size()
-        if ((method.accessModifier & Opcodes.ACC_STATIC) == 0)
-            size+=1
-
-
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
-        mv.visitInsn(Opcodes.DUP)
-        constantInt(mv, size)
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-        constantInt(mv, -size)
-        mv.visitInsn(Opcodes.IADD)
-        mv.visitVarInsn(Opcodes.ISTORE,1)
-
-        if ((method.accessModifier & Opcodes.ACC_STATIC) == 0) {
-            ArgType type = parent.type
-            mv.visitVarInsn(Opcodes.ALOAD,0)
-            mv.visitVarInsn(Opcodes.ILOAD,1)
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
-            type.castTo(mv)
-        }
-        for (int i = 0; i < method.args.size(); i++) {
-            ArgType type = method.args.get(i)
-            mv.visitVarInsn(Opcodes.ALOAD,0)
-            mv.visitVarInsn(Opcodes.ILOAD,1)
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
-            type.castTo(mv)
-        }
-
-        int opcode = Opcodes.INVOKEVIRTUAL
-        if ((method.accessModifier & Opcodes.ACC_STATIC) != 0)
-            opcode=Opcodes.INVOKESTATIC
-        else if (isinterface)
-            opcode=Opcodes.INVOKEINTERFACE
-        mv.visitMethodInsn(opcode, parent.type.names.join('/'), method.name, callDesc.toString(), isinterface)
-
-        method.out.castAsObject(mv)
-
-        mv.visitInsn(Opcodes.ARETURN)
-        mv.visitMaxs(-1,-1)
-        mv.visitEnd()
-    }
-
-    static void writeClassCaller(BrainMap.BrainType type, MethodVisitor mv) {
-        mv.visitCode()
-        mv.visitLdcInsn(Type.getType(type.type.names.join('/')))
-        mv.visitInsn(Opcodes.ARETURN)
-        mv.visitMaxs(-1,-1)
-        mv.visitEnd()
-    }
-
-    static void writeFieldGetter(BrainMap.BrainGetter getter, MethodVisitor mv, BrainMap.BrainType parent) {
-        mv.visitCode()
-
-        if ((getter.accessModifier & Opcodes.ACC_STATIC) == 0) {
-            mv.visitVarInsn(Opcodes.ALOAD,0)
-
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
-            mv.visitInsn(Opcodes.DUP)
-            constantInt(mv, 1)
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-            mv.visitInsn(Opcodes.ICONST_M1)
-            mv.visitInsn(Opcodes.IADD)
-
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
-            parent.type.castTo(mv)
-
-            mv.visitFieldInsn(Opcodes.GETFIELD, parent.type.names.join('/'), getter.name, getter.type.desc)
-        } else {
-            mv.visitFieldInsn(Opcodes.GETSTATIC, parent.type.names.join('/'), getter.name, getter.type.desc)
-        }
-
-        mv.visitInsn(Opcodes.ARETURN)
-        mv.visitMaxs(-1,-1)
-        mv.visitEnd()
-    }
-
-    static void writeFieldPutter(BrainMap.BrainPutter putter, MethodVisitor mv, BrainMap.BrainType parent) {
-        mv.visitCode()
-
-        if ((putter.accessModifier & Opcodes.ACC_STATIC) == 0) {
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
-            mv.visitInsn(Opcodes.DUP)
-            constantInt(mv, 2)
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-            mv.visitInsn(Opcodes.ICONST_M1)
-            mv.visitInsn(Opcodes.IADD)
-            mv.visitVarInsn(Opcodes.ISTORE,1)
-
-            mv.visitVarInsn(Opcodes.ALOAD,0)
-            mv.visitVarInsn(Opcodes.ILOAD,1)
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
-            parent.type.castTo(mv)
-
-            mv.visitVarInsn(Opcodes.ALOAD,0)
-            mv.visitVarInsn(Opcodes.ILOAD,1)
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
-            putter.type.castTo(mv)
-
-            mv.visitFieldInsn(Opcodes.PUTFIELD, parent.type.names.join('/'), putter.name, putter.type.desc)
-        } else {
-            mv.visitVarInsn(Opcodes.ALOAD,0)
-
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
-            mv.visitInsn(Opcodes.DUP)
-            constantInt(mv, 1)
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-            mv.visitInsn(Opcodes.ICONST_M1)
-            mv.visitInsn(Opcodes.IADD)
-
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
-            putter.type.castTo(mv)
-
-            mv.visitFieldInsn(Opcodes.PUTSTATIC, parent.type.names.join('/'), putter.name, putter.type.desc)
-        }
-
-        mv.visitInsn(Opcodes.ACONST_NULL)
-        mv.visitInsn(Opcodes.ARETURN)
-        mv.visitMaxs(-1,-1)
-        mv.visitEnd()
-    }
-
-    static void writeBrainCtor(BrainMap.BrainCtor ctor, MethodVisitor mv, BrainMap.BrainType parent) {
-        mv.visitCode()
-
-        StringBuilder callDesc = new StringBuilder("(")
-        ctor.args.each {callDesc.append(it.desc)}
-        callDesc.append(')V')
-
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
-        mv.visitInsn(Opcodes.DUP)
-        constantInt(mv, ctor.args.size())
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-        constantInt(mv, -ctor.args.size())
-        mv.visitInsn(Opcodes.IADD)
-        mv.visitVarInsn(Opcodes.ISTORE,1)
-
-        mv.visitTypeInsn(Opcodes.NEW, parent.type.names.join('/'))
-        mv.visitInsn(Opcodes.DUP)
-
-        for (int i = 0; i < ctor.args.size(); i++) {
-            ArgType type = ctor.args.get(i)
-            mv.visitVarInsn(Opcodes.ALOAD,0)
-            mv.visitVarInsn(Opcodes.ILOAD,1)
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
-            type.castTo(mv)
-        }
-
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, parent.type.names.join('/'), INIT_NAME, callDesc.toString(), false)
-        mv.visitInsn(Opcodes.ARETURN)
-        mv.visitMaxs(-1,-1)
-        mv.visitEnd()
-    }
-
-    void writeBrainMap(BrainMap map) {
-        int counter = -1
-        for (BrainMap.BrainType type : map.classes) {
-            counter++
-            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, CALLER_PREFIX+counter,CALLER_DESC,null,null)
-            writeClassCaller(type, mv)
-            for (BrainMap.BrainChild child : type.children) {
-                mv = cw.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, CALLER_PREFIX+counter,CALLER_DESC,null,null)
-                counter++
-                if (child instanceof BrainMap.BrainMethod) {
-                    writeBrainMethod(child, mv, type)
-                } else if (child instanceof BrainMap.BrainCtor) {
-                    writeBrainCtor(child, mv, type)
-                } else if (child instanceof BrainMap.BrainPutter) {
-                    writeFieldPutter(child, mv, type)
-                } else if (child instanceof BrainMap.BrainGetter) {
-                    writeFieldGetter(child, mv, type)
+                    arg = method.args.get(i-1)
+            } else
+                arg = method.args.get(i)
+            if (arg instanceof PrimitiveType) {
+                switch (arg) {
+                    case PrimitiveType.INT -> mv.visitVarInsn(Opcodes.ILOAD, i)
+                    case PrimitiveType.SHORT -> mv.visitVarInsn(Opcodes.ILOAD, i)
+                    case PrimitiveType.BYTE -> mv.visitVarInsn(Opcodes.ILOAD, i)
+                    case PrimitiveType.CHAR -> mv.visitVarInsn(Opcodes.ILOAD, i)
+                    case PrimitiveType.LONG -> mv.visitVarInsn(Opcodes.LLOAD, i)
+                    case PrimitiveType.FLOAT -> mv.visitVarInsn(Opcodes.FLOAD, i)
+                    case PrimitiveType.DOUBLE -> mv.visitVarInsn(Opcodes.DLOAD, i)
+                    case PrimitiveType.BOOLEAN -> mv.visitVarInsn(Opcodes.ILOAD, i)
                 }
+                arg.castAsObject(mv)
+            } else if (arg instanceof ObjectType) {
+                mv.visitVarInsn(Opcodes.ALOAD, i)
+            }
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "add", "(L${OBJECT_NAME};)Z", true)
+            mv.visitInsn(Opcodes.POP)
+        }
+
+        ctx.code().each {
+            parseCode(it, mv, numArgs, parent.type.name, method)
+        }
+
+        ret(mv, method.out, numArgs)
+
+        mv.visitMaxs(-1,-1)
+        mv.visitEnd()
+    }
+
+
+    static void parseCode(BrainfrickParser.CodeContext ctx, MethodVisitor mv, int cells, String classname, BrainMap.BrainMethod method) {
+        /**
+         * cells: Cells
+         * cells+1: pointer
+         * cells+2: buffer
+         * cells+3: args
+         */
+        if (ctx.cond()!=null) {
+            mv.visitVarInsn(Opcodes.ALOAD, cells)
+            mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "isZero", "(I)Z", false)
+
+            Label afterFirst = new Label()
+            Label afterLast = new Label()
+            mv.visitJumpInsn(Opcodes.IFEQ, afterLast)
+            mv.visitLabel(afterFirst)
+
+            // Code in the middle
+            ctx.cond().code().each {
+                parseCode(it,mv,cells,classname,method)
+            }
+
+            mv.visitVarInsn(Opcodes.ALOAD, cells)
+            mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "isZero", "(I)Z", false)
+
+            mv.visitJumpInsn(Opcodes.IFNE, afterFirst)
+            mv.visitLabel(afterLast)
+
+        } else {
+            var instr = ctx.instr()
+            if (instr instanceof BrainfrickParser.PushContext) {
+                mv.visitVarInsn(Opcodes.ALOAD, cells+2)
+                mv.visitVarInsn(Opcodes.ALOAD, cells)
+                mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "get", "(I)L${OBJECT_NAME};", false)
+                mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "add", "(L${OBJECT_NAME};)Z", true)
+                mv.visitInsn(Opcodes.POP)
+            } else if (instr instanceof BrainfrickParser.PullContext) {
+                mv.visitVarInsn(Opcodes.ALOAD, cells)
+                mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+
+                mv.visitVarInsn(Opcodes.ALOAD, cells+3)
+
+                mv.visitVarInsn(Opcodes.ALOAD, cells)
+                mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "asInt", "(I)I", false)
+
+                mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "get", "(I)L${OBJECT_NAME};", true)
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "set", "(IL${OBJECT_NAME};)V", false)
+            } else if (instr instanceof BrainfrickParser.PincrContext) {
+                mv.visitIincInsn(cells+1,1)
+            } else if (instr instanceof BrainfrickParser.PdecrContext) {
+                mv.visitIincInsn(cells+1, -1)
+            } else if (instr instanceof BrainfrickParser.IncrContext) {
+                mv.visitVarInsn(Opcodes.ALOAD, cells)
+                mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+                mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "incr", "(I)V", true)
+            } else if (instr instanceof BrainfrickParser.DecrContext) {
+                mv.visitVarInsn(Opcodes.ALOAD, cells)
+                mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+                mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "decr", "(I)V", true)
+            } else if (instr instanceof BrainfrickParser.OperateContext) {
+                mv.visitVarInsn(Opcodes.ALOAD, cells)
+                mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+                mv.visitFieldInsn(Opcodes.GETSTATIC, classname, BrainMapCompiler.BRAINMAP_FIELD, BrainMapCompiler.BRAINMAP_FIELD_DESC)
+                mv.visitVarInsn(Opcodes.ALOAD, cells)
+                mv.visitVarInsn(Opcodes.ILOAD, cells+1)
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "asInt", "(I)I", false)
+                mv.visitInsn(Opcodes.AALOAD)
+                mv.visitVarInsn(Opcodes.ALOAD, cells+2)
+                mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, BrainMapCompiler.CALLER_NAME, "call", BrainMapCompiler.CALLER_DESC, true)
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "set", "(IL${OBJECT_NAME};)V", false)
+            } else if (instr instanceof BrainfrickParser.ReturnContext) {
+                ret(mv, method.out, cells)
             }
         }
-        counter++
+    }
 
-        FieldVisitor mapfield = cw.visitField(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL,
-                BRAINMAP_FIELD, BRAINMAP_FIELD_DESC, null, null)
-        mapfield.visitEnd()
+    static void ret(MethodVisitor mv, ThingType outType, int cells) {
+        mv.visitVarInsn(Opcodes.ALOAD, cells+2)
+        mv.visitInsn(Opcodes.DUP)
+        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "size", "()I", true)
+        mv.visitInsn(Opcodes.ICONST_M1)
+        mv.visitInsn(Opcodes.IADD)
+        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "get", "(I)L${OBJECT_NAME};", true)
+        outType.castTo(mv)
 
-        MethodVisitor clinit = cw.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, CLINIT, CLINIT_DESC, null, null)
-        clinit.visitCode()
-        constantInt(clinit, counter)
-        clinit.visitTypeInsn(Opcodes.ANEWARRAY,CALLER_NAME)
-        clinit.visitVarInsn(Opcodes.ASTORE,0)
-        for (int i = 0; i < counter; i++) {
-            clinit.visitVarInsn(Opcodes.ALOAD,0)
-            constantInt(clinit, i)
-            Handle bootstrap = new Handle(Opcodes.H_INVOKESTATIC, LAMBDAMETAFACTORY_NAME, "metafactory", METAFACTORY_DESC, false)
-            clinit.visitInvokeDynamicInsn("call", "()L${CALLER_NAME};",
-                    bootstrap,
-                    Type.getType(CALLER_DESC),
-                    new Handle(Opcodes.H_INVOKESTATIC, classname, CALLER_PREFIX+i, CALLER_DESC, false),
-                    Type.getType(CALLER_DESC)
-            )
-            clinit.visitInsn(Opcodes.AASTORE)
+        if (outType instanceof ObjectType) {
+            mv.visitInsn(Opcodes.ARETURN)
+        } else if (outType instanceof VoidType) {
+            mv.visitInsn(Opcodes.RETURN)
+        } else if (outType instanceof PrimitiveType) {
+            switch (outType) {
+                case PrimitiveType.INT -> mv.visitInsn(Opcodes.IRETURN)
+                case PrimitiveType.SHORT -> mv.visitInsn(Opcodes.IRETURN)
+                case PrimitiveType.BYTE -> mv.visitInsn(Opcodes.IRETURN)
+                case PrimitiveType.CHAR -> mv.visitInsn(Opcodes.IRETURN)
+                case PrimitiveType.LONG -> mv.visitInsn(Opcodes.LRETURN)
+                case PrimitiveType.FLOAT -> mv.visitInsn(Opcodes.FRETURN)
+                case PrimitiveType.DOUBLE -> mv.visitInsn(Opcodes.DRETURN)
+                case PrimitiveType.BOOLEAN -> mv.visitInsn(Opcodes.IRETURN)
+            }
         }
-        clinit.visitVarInsn(Opcodes.ALOAD,0)
-        clinit.visitFieldInsn(Opcodes.PUTSTATIC, classname, BRAINMAP_FIELD, BRAINMAP_FIELD_DESC)
-
-        clinit.visitMaxs(-1,-1)
-        clinit.visitEnd()
     }
 }
