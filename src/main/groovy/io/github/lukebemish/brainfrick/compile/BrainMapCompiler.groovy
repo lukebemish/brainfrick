@@ -223,11 +223,11 @@ class BrainMapCompiler {
     void writeBrainMap(BrainMap map) {
         int counter = 0
         for (BrainMap.BrainType type : map.classes) {
-            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, CALLER_PREFIX+counter,CALLER_DESC,null,null)
+            MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_SYNTHETIC, CALLER_PREFIX+counter,CALLER_DESC,null,null)
             writeClassCaller(type, mv)
             counter++
             for (BrainMap.BrainChild child : type.children) {
-                mv = cw.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC, CALLER_PREFIX+counter,CALLER_DESC,null,null)
+                mv = cw.visitMethod(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_SYNTHETIC, CALLER_PREFIX+counter,CALLER_DESC,null,null)
                 counter++
                 if (child instanceof BrainMap.BrainMethod) {
                     writeBrainMethod(child, mv, type)
