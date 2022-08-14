@@ -6,8 +6,9 @@ package io.github.lukebemish.brainfrick.compile.grammar;
 
 program     : MAP* class* ;
 
-class       : DECL '{' method* '}' ;
-method      : DECL '{' code* '}' ;
+class       : DECL '{' (method | methodDecl)* '}' ;
+methodDecl  : DECL method ;
+method      : '{' code* '}' ;
 
 code        : cond | instr ;
 

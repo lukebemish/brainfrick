@@ -31,6 +31,7 @@ class BrainMapCompiler {
 
     ClassWriter cw
     String classname
+    MethodVisitor partialClinit
 
     private static void constantInt(MethodVisitor mv, int val) {
         switch (val) {
@@ -265,7 +266,6 @@ class BrainMapCompiler {
         clinit.visitVarInsn(Opcodes.ALOAD,0)
         clinit.visitFieldInsn(Opcodes.PUTSTATIC, classname, BRAINMAP_FIELD, BRAINMAP_FIELD_DESC)
 
-        clinit.visitMaxs(-1,-1)
-        clinit.visitEnd()
+        partialClinit = clinit
     }
 }

@@ -38,12 +38,59 @@ class Compiler {
 
         mapCompiler.writeBrainMap(map)
 
+        //Fields
+        List<BrainMap.BrainField> staticFields = new ArrayList<>()
+        Set<String> knownStatic = new HashSet<>()
+        List<BrainMap.BrainField> instanceFields = new ArrayList<>()
+        Set<String> knownInstance = new HashSet<>()
+        type.children.findAll {it instanceof BrainMap.BrainPutter}.each {
+            if (it.isStatic()) {
+                staticFields.add((BrainMap.BrainField) it)
+                knownStatic.add(((BrainMap.BrainField)it).name)
+            } else {
+                instanceFields.add((BrainMap.BrainField) it)
+                knownInstance.add(((BrainMap.BrainField)it).name)
+            }
+        }
+        type.children.findAll {it instanceof BrainMap.BrainGetter}.each {
+            BrainMap.BrainGetter itg = (BrainMap.BrainGetter) it
+            if (it.isStatic() && !knownStatic.contains(itg.name)) {
+                staticFields.add((BrainMap.BrainField) it)
+                knownStatic.add(((BrainMap.BrainField)it).name)
+            } else if (!knownInstance.contains(itg.name)) {
+                instanceFields.add((BrainMap.BrainField) it)
+                knownInstance.add(((BrainMap.BrainField)it).name)
+            }
+        }
+        ArrayList<BrainMap.BrainField> combined = new ArrayList<>()
+        combined.addAll(instanceFields)
+        combined.addAll(staticFields)
+        combined.each {
+            cw.visitField(it.accessModifier, it.name, it.type.desc, null, null)
+        }
+
+        //Methods
         int methodCounter = 0
-        for (BrainfrickParser.MethodContext mctx : ctx.method()) {
+        for (BrainfrickParser.MethodDeclContext mctx : ctx.methodDecl()) {
             BrainMap.BrainMethod method = type.children.findAll {it instanceof BrainMap.BrainMethod}.collect {(BrainMap.BrainMethod)it}.get(methodCounter)
             methodCounter++
-            parseMethod(mctx, cw, method, type)
+            MethodVisitor mv = cw.visitMethod(method.accessModifier, method.name, "("+method.args.collect {it.desc}.join("")+")"+method.out.desc,null, null)
+            parseMethod(mctx.method(), mv, method, type, false)
         }
+
+        //Static blocks
+        BrainMap.BrainMethod clinit = new BrainMap.BrainMethod()
+        clinit.args = List.of()
+        clinit.out = VoidType.instance
+        clinit.name = "<clinit>"
+        clinit.accessModifier = Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC
+        clinit.setParent(type)
+        for (BrainfrickParser.MethodContext mctx : ctx.method()) {
+            parseMethod(mctx, mapCompiler.partialClinit, clinit, type, true)
+        }
+        mapCompiler.partialClinit.visitInsn(Opcodes.RETURN)
+        mapCompiler.partialClinit.visitMaxs(-1, -1)
+        mapCompiler.partialClinit.visitEnd()
 
         cw.visitEnd()
 
@@ -52,8 +99,7 @@ class Compiler {
         Files.write(outpath,cw.toByteArray())
     }
 
-    static void parseMethod(BrainfrickParser.MethodContext ctx, ClassWriter cw, BrainMap.BrainMethod method, BrainMap.BrainType parent) {
-        MethodVisitor mv = cw.visitMethod(method.accessModifier, method.name, "("+method.args.collect {it.desc}.join("")+")"+method.out.desc,null, null)
+    static void parseMethod(BrainfrickParser.MethodContext ctx, MethodVisitor mv, BrainMap.BrainMethod method, BrainMap.BrainType parent, boolean isinit) {
 
         int numArgs = method.args.size()+(method.isStatic()?0:1)
 
@@ -103,17 +149,19 @@ class Compiler {
         }
 
         ctx.code().each {
-            parseCode(it, mv, numArgs, parent.type.name, method)
+            parseCode(it, mv, numArgs, parent.type.name, method, isinit)
         }
 
-        ret(mv, method.out, numArgs)
+        if (!method.isStatic() || isinit) {
+            ret(mv, method.out, numArgs)
 
-        mv.visitMaxs(-1,-1)
-        mv.visitEnd()
+            mv.visitMaxs(-1, -1)
+            mv.visitEnd()
+        }
     }
 
 
-    static void parseCode(BrainfrickParser.CodeContext ctx, MethodVisitor mv, int cells, String classname, BrainMap.BrainMethod method) {
+    static void parseCode(BrainfrickParser.CodeContext ctx, MethodVisitor mv, int cells, String classname, BrainMap.BrainMethod method, boolean isinit) {
         /**
          * cells: Cells
          * cells+1: pointer
@@ -132,7 +180,7 @@ class Compiler {
 
             // Code in the middle
             ctx.cond().code().each {
-                parseCode(it,mv,cells,classname,method)
+                parseCode(it, mv, cells, classname, method, isinit)
             }
 
             mv.visitVarInsn(Opcodes.ALOAD, cells)

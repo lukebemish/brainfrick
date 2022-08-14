@@ -17,10 +17,16 @@ class TestCompile {
 public class brainfrick.test.Test1
 static public int add(int,int)
 static public int add2(int)
+static final put int staticInt
+private get Object someObject
+private put Object someObject
 """
     static String CODE = """
 "brainmap.map"
 ;{
+    {
+        +++>++.<:
+    }
     ;{
         ,>+,<[->+<]>.
     }
