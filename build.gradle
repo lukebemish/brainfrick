@@ -1,0 +1,30 @@
+plugins {
+    id 'groovy'
+    id 'idea'
+    id 'antlr'
+    id 'java'
+}
+
+group 'io.github.lukebemish.brainfrick'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.groovy:groovy:4.0.4'
+    antlr 'org.antlr:antlr4:4.10.1'
+    implementation 'org.ow2.asm:asm:9.3'
+}
+
+sourceSets.main.java.srcDir new File("build/generated-src/antlr/main")
+idea {
+    module {
+        sourceDirs += file('src/main/antlr')
+        generatedSourceDirs += file("build/generated-src/antlr/main")
+        testSourceDirs += file('src/test/antlr')
+    }
+}
+
+compileGroovy.dependsOn generateGrammarSource
