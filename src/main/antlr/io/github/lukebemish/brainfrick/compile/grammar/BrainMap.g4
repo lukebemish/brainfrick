@@ -9,8 +9,8 @@ type        : interface #interfaceType
             | class #classType
             ;
 
-interface   : INTERFACE name target* ;
-class       : CLASS name target* ;
+interface   : INTERFACE name ('.' name)* target* ;
+class       : CLASS name ('.' name)* target* ;
 
 target      : ctor #ctorTarget
             | method #methodTarget
@@ -33,6 +33,11 @@ argName     : primitive #primitiveArg
             | name ('.' name)* # objArg
             ;
 
+returnName  : primitive #primitiveOut
+            | VOID #voidOut
+            | name ('.' name)* # objOut
+            ;
+
 primitive   : INT
             | SHORT
             | BYTE
@@ -40,11 +45,7 @@ primitive   : INT
             | LONG
             | FLOAT
             | DOUBLE
-            ;
-
-returnName  : primitive #primitiveOut
-            | VOID #voidOut
-            | name ('.' name)* # objOut
+            | BOOLEAN
             ;
 
 
@@ -107,6 +108,8 @@ SHORT
     : 'short' ;
 BYTE
     : 'byte' ;
+BOOLEAN
+    : 'boolean' ;
 VOID
     : 'void' ;
 

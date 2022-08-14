@@ -2,9 +2,10 @@ package io.github.lukebemish.brainfrick.compile.map
 
 import groovy.transform.CompileStatic
 import io.github.lukebemish.brainfrick.compile.grammar.BrainMapParser
+import org.objectweb.asm.MethodVisitor
 
 @CompileStatic
-interface ArgType {
+interface ArgType extends ThingType {
     static class Parser {
         static ArgType parse(BrainMapParser.ArgNameContext ctx) {
             if (ctx instanceof BrainMapParser.PrimitiveArgContext)
@@ -13,4 +14,5 @@ interface ArgType {
                 return new ObjectType(ctx.name().collect {it.text})
         }
     }
+    void castTo(MethodVisitor mv)
 }

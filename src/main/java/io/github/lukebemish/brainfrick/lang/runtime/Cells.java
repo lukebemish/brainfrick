@@ -1,4 +1,7 @@
-package io.github.lukebemish.brainfrick.runtime;
+package io.github.lukebemish.brainfrick.lang.runtime;
+
+import io.github.lukebemish.brainfrick.lang.ImproperTypeException;
+import io.github.lukebemish.brainfrick.lang.Incrementable;
 
 import java.util.Arrays;
 
@@ -60,12 +63,16 @@ public class Cells {
                 obj instanceof Boolean;
     }
 
-    private int getIntValue(Object obj) {
+    public static int getIntValue(Object obj) {
         if (obj instanceof Number number)
             return number.intValue();
-        if (obj instanceof Character character)
+        else if (obj instanceof Character character)
             return character;
-        return 0;
+        else if (obj instanceof Boolean bool)
+            return Boolean.TRUE.equals(bool)?1:0;
+        else if (obj == null)
+            return 0;
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not integer-like.");
     }
 
     public boolean isZero(int idx) {
@@ -80,6 +87,8 @@ public class Cells {
             return d==0;
         else if (obj instanceof Long l)
             return l==0;
+        else if (obj instanceof Boolean b)
+            return Boolean.FALSE.equals(b);
         return false;
     }
 
@@ -102,6 +111,8 @@ public class Cells {
             toSet = f+1;
         else if (obj instanceof Double d)
             toSet = d+1;
+        else if (obj instanceof Boolean b)
+            toSet = Boolean.FALSE.equals(b)?Boolean.TRUE:2;
         else if (obj instanceof Incrementable incrementable)
             toSet = incrementable.incr();
         else
@@ -128,6 +139,8 @@ public class Cells {
             toSet = f-1;
         else if (obj instanceof Double d)
             toSet = d-1;
+        else if (obj instanceof Boolean b)
+            toSet = Boolean.TRUE.equals(b)?Boolean.FALSE:-1;
         else if (obj instanceof Incrementable incrementable)
             toSet = incrementable.decr();
         else

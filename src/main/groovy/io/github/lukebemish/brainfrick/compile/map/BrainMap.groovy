@@ -2,6 +2,7 @@ package io.github.lukebemish.brainfrick.compile.map
 
 import groovy.transform.CompileStatic
 import io.github.lukebemish.brainfrick.compile.grammar.BrainMapParser
+import org.objectweb.asm.Opcodes
 
 @CompileStatic
 class BrainMap {
@@ -24,6 +25,8 @@ class BrainMap {
             ctx.class_().target().each {
                 type.children.add(parseBrainChild(it))
             }
+            type.children.each {it.setParent(type)}
+            type.type = new ObjectType(ctx.class_().name().collect {it.text})
             return type
         } else if (ctx instanceof BrainMapParser.InterfaceTypeContext) {
             var type = new BrainInterface()
@@ -34,6 +37,8 @@ class BrainMap {
                     //TODO: throw error
                 }
             }
+            type.methods.each {it.setParent(type)}
+            type.type = new ObjectType(ctx.interface_().name().collect {it.text})
             return type
         }
     }
@@ -48,11 +53,19 @@ class BrainMap {
     }
 
     static BrainCtor parseBrainCtor(BrainMapParser.CtorContext ctx) {
-
+        BrainCtor ctor = new BrainCtor()
+        ctor.args = ctx.argName().collect {ArgType.Parser.parse(it)}
+        ctor.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
+        return ctor
     }
 
     static BrainMethod parseBrainMethod(BrainMapParser.MethodContext ctx) {
-
+        BrainMethod method = new BrainMethod()
+        method.name = ctx.name().text
+        method.args = ctx.argName().collect {ArgType.Parser.parse(it)}
+        method.out = ReturnType.Parser.parse(ctx.returnName())
+        method.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
+        return method
     }
 
     static BrainField parseBrainField(BrainMapParser.FieldContext ctx) {
@@ -69,7 +82,8 @@ class BrainMap {
 
     List<BrainType> classes = new ArrayList<>()
 
-    static interface BrainType {
+    static trait BrainType {
+        ObjectType type
     }
     
     static class BrainClass implements BrainType {
@@ -77,11 +91,23 @@ class BrainMap {
     }
 
     static class BrainInterface implements BrainType {
-        List<BrainMethod> methods = new ArrayList<>();
+        List<BrainMethod> methods = new ArrayList<>()
     }
     
     static trait BrainChild {
+        private BrainType parent
         int accessModifier
+
+        setParent(BrainType parent) {
+            this.parent = parent
+            if (parent instanceof BrainInterface) {
+                accessModifier |= Opcodes.ACC_ABSTRACT
+            }
+        }
+
+        getParent() {
+            parent
+        }
     }
 
     static class BrainCtor implements BrainChild {

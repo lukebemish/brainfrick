@@ -37,7 +37,7 @@ enum Modifier {
     static int access(Set<Modifier> modifiers) {
         int access = 0
         for (Modifier m : modifiers)
-            access+=m.accessModifier
+            access|=m.accessModifier
         return access
     }
 }

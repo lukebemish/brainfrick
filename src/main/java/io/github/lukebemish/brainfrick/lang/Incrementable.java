@@ -1,4 +1,4 @@
-package io.github.lukebemish.brainfrick.runtime;
+package io.github.lukebemish.brainfrick.lang;
 
 public interface Incrementable {
     Object incr();
