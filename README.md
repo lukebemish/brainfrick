@@ -42,7 +42,7 @@ map was saved as `brainmap.map`, a corresponding brainfrick source file might be
         ;
     }
 }
-// A "-" tells the compiler to skip this class - in this case, we don't want to redefine Object!
+// A "-" tells the compiler to skip this class or method - in this case, we don't want to redefine Object!
 -
 ;{
     // A ";" on its own for a method definition defines, but skips, an abstract method.
