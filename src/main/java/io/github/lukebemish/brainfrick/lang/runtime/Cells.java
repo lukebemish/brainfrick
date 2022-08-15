@@ -1,5 +1,6 @@
 package io.github.lukebemish.brainfrick.lang.runtime;
 
+import io.github.lukebemish.brainfrick.lang.Decrementable;
 import io.github.lukebemish.brainfrick.lang.ImproperTypeException;
 import io.github.lukebemish.brainfrick.lang.Incrementable;
 
@@ -145,8 +146,8 @@ public class Cells {
             toSet = d-1;
         else if (obj instanceof Boolean b)
             toSet = Boolean.TRUE.equals(b)?Boolean.FALSE:-1;
-        else if (obj instanceof Incrementable incrementable)
-            toSet = incrementable.decr();
+        else if (obj instanceof Decrementable decrementable)
+            toSet = decrementable.decr();
         else
             throw new UnsupportedOperationException(String.format("Objects of type %s do not support decrementing",obj.getClass()));
         set(idx,toSet);
