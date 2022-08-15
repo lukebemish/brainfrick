@@ -1,4 +1,4 @@
-package io.github.lukebemish.brainfrick.lang;
+package io.github.lukebemish.brainfrick.lang.runtime;
 
 public class BufferTooSmallException extends RuntimeException {
     public BufferTooSmallException(String msg) {

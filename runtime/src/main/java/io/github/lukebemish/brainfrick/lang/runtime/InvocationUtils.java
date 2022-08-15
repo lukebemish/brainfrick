@@ -1,8 +1,5 @@
 package io.github.lukebemish.brainfrick.lang.runtime;
 
-import io.github.lukebemish.brainfrick.lang.BufferTooSmallException;
-import io.github.lukebemish.brainfrick.lang.ImproperTypeException;
-
 public final class InvocationUtils {
     private InvocationUtils() {}
 

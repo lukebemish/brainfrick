@@ -1,0 +1,7 @@
+group 'io.github.lukebemish.brainfrick'
+version '1.0-SNAPSHOT'
+archivesBaseName = "brainfrick-runtime"
+
+repositories {
+    mavenCentral()
+}

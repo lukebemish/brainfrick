@@ -1,7 +1,6 @@
 package io.github.lukebemish.brainfrick.lang.runtime;
 
 import io.github.lukebemish.brainfrick.lang.Decrementable;
-import io.github.lukebemish.brainfrick.lang.ImproperTypeException;
 import io.github.lukebemish.brainfrick.lang.Incrementable;
 
 import java.util.Arrays;

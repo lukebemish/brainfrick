@@ -1,32 +1,11 @@
-plugins {
-    id 'groovy'
-    id 'idea'
-    id 'antlr'
-    id 'java'
-}
+subprojects {
+    apply plugin: 'java'
 
-group 'io.github.lukebemish.brainfrick'
-version '1.0-SNAPSHOT'
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    java.withSourcesJar()
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation 'org.apache.groovy:groovy:4.0.4'
-    antlr 'org.antlr:antlr4:4.10.1'
-    implementation 'org.ow2.asm:asm:9.3'
-    implementation 'org.apache.commons:commons-text:1.9'
-    implementation 'org.jetbrains:annotations:23.0.0'
-}
-
-sourceSets.main.java.srcDir new File("build/generated-src/antlr/main")
-idea {
-    module {
-        sourceDirs += file('src/main/antlr')
-        generatedSourceDirs += file("build/generated-src/antlr/main")
-        testSourceDirs += file('src/test/antlr')
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.release = 17
     }
 }
-
-compileGroovy.dependsOn generateGrammarSource

@@ -6,9 +6,9 @@ import java.nio.file.Path
 import java.util.function.Function
 
 class TestFull {
-    static Path OUTPATH = Path.of("build/test")
-    static Path BRAINFRICK_PATH = Path.of("src/test/brainfrick")
-    static Path MAP_PATH = Path.of("src/test/brainmaps")
+    static Path OUTPATH = Path.of("compiler/build/test")
+    static Path BRAINFRICK_PATH = Path.of("compiler/src/test/brainfrick")
+    static Path MAP_PATH = Path.of("compiler/src/test/brainmaps")
 
     static void main(String[] args) {
         MultipleCompiler.compile(BRAINFRICK_PATH, MAP_PATH, OUTPATH)
