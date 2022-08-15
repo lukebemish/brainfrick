@@ -1,6 +1,5 @@
 public class brainfrick.test.Test1
     static public int add(int,int)
     static public int add2(int)
-    static final put int staticInt
-    private get java.lang.Object someObject
-    private put java.lang.Object someObject
+    public new() -> java.lang.Object new()
+class java.lang.Object

@@ -17,9 +17,14 @@ target      : ctor #ctorTarget
             | field #fieldTarget
             ;
 
-ctor        : modifier* NEW '(' (argName (',' argName)*)? ')' ;
-method      : modifier* returnName name '(' (argName (',' argName)*)? ')' ;
+ctor        : modifier* NEW '(' (argName (',' argName)*)? ')' superCtor? ;
+method      : modifier* returnName name '(' (argName (',' argName)*)? ')' superMethod? ;
 field       : modifier* (GET | PUT) returnName name ;
+
+superCtor   : '->' classname NEW '('(argName (',' argName)*)?')' ;
+superMethod : '->' classname returnName name '('(argName (',' argName)*)?')' ;
+
+classname   : name ('.' name)* ;
 
 modifier    : PROTECTED
             | PRIVATE
@@ -91,6 +96,8 @@ LPAREN
     : '(' ;
 RPAREN
     : ')' ;
+SUPER
+    : '->' ;
 
 BOOL
     : 'bool' ;

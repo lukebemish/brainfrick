@@ -148,7 +148,7 @@ public class Cells {
         else if (obj instanceof Incrementable incrementable)
             toSet = incrementable.decr();
         else
-            throw new UnsupportedOperationException(String.format("Objects of type %s do not support decrementing",obj.getClass()));
+            toSet = null;
         set(idx,toSet);
     }
 

@@ -61,6 +61,11 @@ class BrainMap {
         BrainCtor ctor = new BrainCtor()
         ctor.args = ctx.argName().collect {ArgType.Parser.parse(it)}
         ctor.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
+        if (ctx.superCtor() !== null) {
+            ctor.superCtor = new BrainCtor.SuperCtor()
+            ctor.superCtor.args = ctx.superCtor().argName().collect {ArgType.Parser.parse(it)}
+            ctor.superCtor.type = new ObjectType(ctx.superCtor().classname().name().collect {it.text})
+        }
         return ctor
     }
 
@@ -70,6 +75,13 @@ class BrainMap {
         method.args = ctx.argName().collect {ArgType.Parser.parse(it)}
         method.out = ReturnType.Parser.parse(ctx.returnName())
         method.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
+        if (ctx.superMethod() !== null) {
+            method.superMethod = new BrainMethod.SuperMethod()
+            method.superMethod.name = ctx.superMethod().name().text
+            method.superMethod.args = ctx.superMethod().argName().collect {ArgType.Parser.parse(it)}
+            method.superMethod.out = ReturnType.Parser.parse(ctx.returnName())
+            method.superMethod.type = new ObjectType(ctx.superMethod().classname().name().collect {it.text})
+        }
         return method
     }
 
@@ -128,12 +140,26 @@ class BrainMap {
 
     static class BrainCtor implements BrainChild {
         List<ArgType> args
+        SuperCtor superCtor
+
+        static class SuperCtor {
+            List<ArgType> args
+            ObjectType type
+        }
     }
 
     static class BrainMethod implements BrainChild {
         String name
         ReturnType out
         List<ArgType> args
+        SuperMethod superMethod
+
+        static class SuperMethod {
+            String name
+            ReturnType out
+            List<ArgType> args
+            ObjectType type
+        }
     }
 
     static trait BrainField extends BrainChild {

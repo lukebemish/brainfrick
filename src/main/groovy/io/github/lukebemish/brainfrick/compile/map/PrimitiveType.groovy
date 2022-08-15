@@ -23,7 +23,7 @@ enum PrimitiveType implements ArgType, ReturnType {
 
     @Override
     void castTo(MethodVisitor mv) {
-        String methodName = "to"+desc
+        String methodName = "as"+desc
         String methodDesc = "(Ljava/lang/Object;)${desc}"
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, InvocationUtils.class.name.replace('.','/'),methodName, methodDesc, false)
     }

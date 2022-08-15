@@ -33,7 +33,7 @@ class BrainMapCompiler {
     String classname
     MethodVisitor partialClinit
 
-    private static void constantInt(MethodVisitor mv, int val) {
+    static void constantInt(MethodVisitor mv, int val) {
         switch (val) {
             case -1 -> mv.visitInsn(Opcodes.ICONST_M1)
             case 0 -> mv.visitInsn(Opcodes.ICONST_0)

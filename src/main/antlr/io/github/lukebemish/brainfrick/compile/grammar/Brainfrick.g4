@@ -6,8 +6,8 @@ package io.github.lukebemish.brainfrick.compile.grammar;
 
 program     : MAP* class* ;
 
-class       : DECL '{' (method | methodDecl)* '}' ;
-methodDecl  : DECL method ;
+class       : DECL_SUPER '{' (method | methodDecl)* '}' ;
+methodDecl  : DECL_SUPER method ;
 method      : '{' code* '}' ;
 
 code        : cond | instr ;
@@ -22,6 +22,7 @@ instr       : PINCR #pincr
             | PUSH #push
             | OPERATE #operate
             | RETURN #return
+            | ';' #super
             ;
 
 MAP
@@ -35,7 +36,7 @@ BEGIN:      '[' ;
 END:        ']' ;
 PULL:       ',' ;
 PUSH:       '.' ;
-DECL:       ';' ;
+DECL_SUPER: ';' ;
 OPERATE:    ':' ;
 OPEN:       '{' ;
 CLOSE:      '}' ;
