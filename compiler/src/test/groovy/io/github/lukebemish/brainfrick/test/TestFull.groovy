@@ -27,5 +27,8 @@ class TestFull {
         println "TestMain:"
         Class<?> testMain = cl.loadClass("brainfrick.test.TestMain")
         testMain.getMethod("main", String.class.arrayType()).invoke(null, new Object[]{new String[]{}})
+        println "TestHelloWorld:"
+        Class<?> testHelloWorld = cl.loadClass("brainfrick.test.TestHelloWorld")
+        println testHelloWorld.getMethod("helloWorld").invoke(null)
     }
 }

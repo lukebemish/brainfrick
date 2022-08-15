@@ -1,0 +1,4 @@
+public class brainfrick.test.TestHelloWorld
+    static public java.lang.String helloWorld()
+    public new() -> java.lang.Object new()
+class java.lang.Object

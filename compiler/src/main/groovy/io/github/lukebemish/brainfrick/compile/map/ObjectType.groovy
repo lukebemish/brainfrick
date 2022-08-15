@@ -1,6 +1,8 @@
 package io.github.lukebemish.brainfrick.compile.map
 
 import groovy.transform.CompileStatic
+import io.github.lukebemish.brainfrick.compile.BrainMapCompiler
+import io.github.lukebemish.brainfrick.lang.runtime.StringUtils
 import org.jetbrains.annotations.NotNull
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -49,5 +51,22 @@ class ObjectType implements ArgType, ReturnType {
     @Override
     void readArg(MethodVisitor mv, int idx) {
         mv.visitVarInsn(Opcodes.ALOAD, idx)
+    }
+
+    @Override
+    void writeReturn(MethodVisitor mv, int cells) {
+        if (name != new ObjectType(String.class).name) {
+            mv.visitVarInsn(Opcodes.ALOAD, cells + 2)
+            mv.visitInsn(Opcodes.DUP)
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.', '/'), "size", "()I", true)
+            mv.visitInsn(Opcodes.ICONST_M1)
+            mv.visitInsn(Opcodes.IADD)
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.', '/'), "get", "(I)L${BrainMapCompiler.OBJECT_NAME};", true)
+            this.castTo(mv)
+        } else {
+            mv.visitVarInsn(Opcodes.ALOAD, cells + 2)
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, StringUtils.class.name.replace('.','/'), "fromChars", "(L${BrainMapCompiler.LIST_NAME};)L${String.class.name.replace('.','/')};", false)
+        }
+        mv.visitInsn(Opcodes.ARETURN)
     }
 }

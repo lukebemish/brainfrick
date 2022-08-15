@@ -2,6 +2,7 @@ package io.github.lukebemish.brainfrick.compile.map
 
 import groovy.transform.CompileStatic
 import io.github.lukebemish.brainfrick.compile.grammar.BrainMapParser
+import org.objectweb.asm.MethodVisitor
 
 @CompileStatic
 interface ReturnType extends ThingType {
@@ -21,4 +22,5 @@ interface ReturnType extends ThingType {
                 return VoidType.instance
         }
     }
+    void writeReturn(MethodVisitor mv, int cells)
 }

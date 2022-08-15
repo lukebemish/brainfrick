@@ -1,6 +1,7 @@
 package io.github.lukebemish.brainfrick.compile.map
 
 import groovy.transform.CompileStatic
+import io.github.lukebemish.brainfrick.compile.BrainMapCompiler
 import io.github.lukebemish.brainfrick.lang.runtime.InvocationUtils
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -48,5 +49,26 @@ enum PrimitiveType implements ArgType, ReturnType {
             case BOOLEAN -> mv.visitVarInsn(Opcodes.ILOAD, i)
         }
         this.castAsObject(mv)
+    }
+
+    @Override
+    void writeReturn(MethodVisitor mv, int cells) {
+        mv.visitVarInsn(Opcodes.ALOAD, cells+2)
+        mv.visitInsn(Opcodes.DUP)
+        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "size", "()I", true)
+        mv.visitInsn(Opcodes.ICONST_M1)
+        mv.visitInsn(Opcodes.IADD)
+        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "get", "(I)L${BrainMapCompiler.OBJECT_NAME};", true)
+        this.castTo(mv)
+        switch (this) {
+            case INT -> mv.visitInsn(Opcodes.IRETURN)
+            case SHORT -> mv.visitInsn(Opcodes.IRETURN)
+            case BYTE -> mv.visitInsn(Opcodes.IRETURN)
+            case CHAR -> mv.visitInsn(Opcodes.IRETURN)
+            case LONG -> mv.visitInsn(Opcodes.LRETURN)
+            case FLOAT -> mv.visitInsn(Opcodes.FRETURN)
+            case DOUBLE -> mv.visitInsn(Opcodes.DRETURN)
+            case BOOLEAN -> mv.visitInsn(Opcodes.IRETURN)
+        }
     }
 }

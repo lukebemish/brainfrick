@@ -18,4 +18,9 @@ class VoidType implements ReturnType {
     void castTo(MethodVisitor mv) {
         mv.visitInsn(Opcodes.POP)
     }
+
+    @Override
+    void writeReturn(MethodVisitor mv, int cells) {
+        mv.visitInsn(Opcodes.RETURN)
+    }
 }

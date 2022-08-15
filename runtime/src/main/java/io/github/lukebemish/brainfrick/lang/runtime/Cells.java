@@ -4,12 +4,12 @@ import io.github.lukebemish.brainfrick.lang.*;
 
 import java.util.Arrays;
 
-public class Cells {
+public final class Cells {
     private static final Object[] EMPTY_DATA = {};
     private static final int DEFAULT_SIZE = 5;
 
-    protected Object[] dataP;
-    protected Object[] dataN;
+    private Object[] dataP;
+    private Object[] dataN;
     private int sizeP;
     private int sizeN;
 

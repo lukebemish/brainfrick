@@ -308,32 +308,7 @@ class Compiler {
         }
     }
 
-    private static void ret(MethodVisitor mv, ThingType outType, int cells) {
-        if (outType instanceof VoidType) {
-            mv.visitInsn(Opcodes.RETURN)
-        }
-
-        mv.visitVarInsn(Opcodes.ALOAD, cells+2)
-        mv.visitInsn(Opcodes.DUP)
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "size", "()I", true)
-        mv.visitInsn(Opcodes.ICONST_M1)
-        mv.visitInsn(Opcodes.IADD)
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "get", "(I)L${OBJECT_NAME};", true)
-        outType.castTo(mv)
-
-        if (outType instanceof ObjectType) {
-            mv.visitInsn(Opcodes.ARETURN)
-        } else if (outType instanceof PrimitiveType) {
-            switch (outType) {
-                case PrimitiveType.INT -> mv.visitInsn(Opcodes.IRETURN)
-                case PrimitiveType.SHORT -> mv.visitInsn(Opcodes.IRETURN)
-                case PrimitiveType.BYTE -> mv.visitInsn(Opcodes.IRETURN)
-                case PrimitiveType.CHAR -> mv.visitInsn(Opcodes.IRETURN)
-                case PrimitiveType.LONG -> mv.visitInsn(Opcodes.LRETURN)
-                case PrimitiveType.FLOAT -> mv.visitInsn(Opcodes.FRETURN)
-                case PrimitiveType.DOUBLE -> mv.visitInsn(Opcodes.DRETURN)
-                case PrimitiveType.BOOLEAN -> mv.visitInsn(Opcodes.IRETURN)
-            }
-        }
+    private static void ret(MethodVisitor mv, ReturnType outType, int cells) {
+        outType.writeReturn(mv,cells)
     }
 }
