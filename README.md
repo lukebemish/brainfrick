@@ -28,6 +28,9 @@ abstract public class brainfrick.test.TestField
 Brainmaps are referenced at the beginning of a brainfrick source file, and are integrated into classes at compile time. For instance, if the previous
 map was saved as `brainmap.map`, a corresponding brainfrick source file might be:
 ```
+// Brainmaps to use are declared before anything else. Any number can be declared; they will
+// be appended together at compile time.
+"brainmap.map"
 // This syntax opens a class definition - in this case, the class at index 0
 ;{
     // And this opens up a method definition
