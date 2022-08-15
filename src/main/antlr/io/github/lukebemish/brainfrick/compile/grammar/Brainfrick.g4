@@ -6,8 +6,13 @@ package io.github.lukebemish.brainfrick.compile.grammar;
 
 program     : MAP* class* ;
 
-class       : DECL_SUPER '{' (method | methodDecl)* '}' ;
-methodDecl  : DECL_SUPER method ;
+class       : DECL_SUPER '{' (method | methodDecl)* '}' #actualClass
+            | '-' #skipClass
+            ;
+methodDecl  : DECL_SUPER method #actualMethod
+            | DECL_SUPER #abstractMethod
+            | '-' #skipMethod
+            ;
 method      : '{' code* '}' ;
 
 code        : cond | instr ;

@@ -28,6 +28,15 @@ class BrainMap {
             type.children.each {it.setParent(type)}
             type.type = new ObjectType(ctx.class_().name().collect {it.text})
             type.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
+            if (ctx.class_().implementDef() !== null) {
+                type.interfaces = ctx.class_().implementDef().collectMany {it.classname()}.collect {new ObjectType(it.name().collect {it.text})}
+            } else {
+                type.interfaces = List.of()
+            }
+            if (ctx.class_().extendDef() !== null)
+                type.parent = new ObjectType(ctx.class_().extendDef().classname().name().collect {it.text})
+            else
+                type.parent = new ObjectType(Object.class)
             return type
         } else if (ctx instanceof BrainMapParser.InterfaceTypeContext) {
             var type = new BrainType()
@@ -43,7 +52,13 @@ class BrainMap {
             }
             type.children.each {it.setParent(type)}
             type.type = new ObjectType(ctx.interface_().name().collect {it.text})
-            type.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
+            type.accessModifier = Modifier.access(Modifier.parse(ctx.modifier())) | Opcodes.ACC_ABSTRACT | Opcodes.ACC_INTERFACE
+            if (ctx.interface_().implementDef() !== null) {
+                type.interfaces = ctx.interface_().implementDef().classname().collect {new ObjectType(it.name().collect {it.text})}
+            } else {
+                type.interfaces = List.of()
+            }
+            type.parent = new ObjectType(Object.class)
             return type
         }
     }
@@ -106,6 +121,8 @@ class BrainMap {
     static class BrainType {
         ObjectType type
         List<BrainChild> children = new ArrayList<>()
+        ObjectType parent
+        List<ObjectType> interfaces
         boolean isinterface = false
         int accessModifier
     }
@@ -116,9 +133,6 @@ class BrainMap {
 
         void setParent(BrainType parent) {
             this.parent = parent
-            if (parent.isinterface && ((accessModifier & Opcodes.ACC_STATIC) != 0)) {
-                accessModifier |= Opcodes.ACC_ABSTRACT
-            }
         }
 
         BrainType getParent() {

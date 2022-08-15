@@ -8,10 +8,19 @@ import org.objectweb.asm.MethodVisitor
 interface ArgType extends ThingType {
     static class Parser {
         static ArgType parse(BrainMapParser.ArgNameContext ctx) {
-            if (ctx instanceof BrainMapParser.PrimitiveArgContext)
-                return PrimitiveType.valueOf(ctx.text.toUpperCase(Locale.ROOT))
-            else if (ctx instanceof BrainMapParser.ObjArgContext)
-                return new ObjectType(ctx.name().collect {it.text})
+            if (ctx instanceof BrainMapParser.PrimitiveArgContext) {
+                ArgType out = PrimitiveType.valueOf(ctx.text.toUpperCase(Locale.ROOT))
+                for (int i = 0; i < ctx.ARRAY().size(); i++)
+                    out = new ArrayType(out)
+                return out
+            } else if (ctx instanceof BrainMapParser.ObjArgContext) {
+                ArgType out = new ObjectType(ctx.name().collect { it.text })
+                for (int i = 0; i < ctx.ARRAY().size(); i++)
+                    out = new ArrayType(out)
+                return out
+            }
         }
     }
+
+    void readArg(MethodVisitor mv, int idx)
 }

@@ -1,6 +1,0 @@
-public class brainfrick.test.TestMain
-    static public void main(String[])
-class java.lang.System
-    get java.io.PrintStream out
-class java.io.PrintStream
-    void println(int)

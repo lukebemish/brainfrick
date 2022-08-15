@@ -20,12 +20,17 @@ class Compiler {
     Path outdir
     int ccounter = 0
 
-    void parseClass(BrainfrickParser.ClassContext ctx) {
+    void skipClass() {
+        ccounter++
+    }
+
+    void parseClass(BrainfrickParser.ActualClassContext ctx) {
         BrainMap.BrainType type = map.classes.get(ccounter)
         ccounter++
 
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
-        cw.visit(Opcodes.V17, type.accessModifier, type.type.name,null,OBJECT_NAME,new String[]{})
+        String[] interfaces = type.interfaces.collect {it->it.name}.toArray(new String[]{})
+        cw.visit(Opcodes.V17, type.accessModifier, type.type.name,null,type.parent.name,interfaces)
 
         BrainMapCompiler mapCompiler = new BrainMapCompiler()
         mapCompiler.classname = type.type.name
@@ -71,27 +76,38 @@ class Compiler {
         for (BrainfrickParser.MethodDeclContext mctx : ctx.methodDecl()) {
             BrainMap.BrainChild method = knownMethods.get(methodCounter)
             methodCounter++
-            if (method instanceof BrainMap.BrainMethod) {
-                MethodVisitor mv = cw.visitMethod(method.accessModifier, method.name, "(" + method.args.collect { it.desc }.join("") + ")" + method.out.desc, null, null)
-                parseMethod(mctx.method(), mv, method, type, false)
-            } else if (method instanceof BrainMap.BrainCtor) {
-                MethodVisitor mv = cw.visitMethod(method.accessModifier, "<init>", "(" + method.args.collect { it.desc }.join("") + ")V", null, null)
-                BrainMap.BrainMethod newMethod = new BrainMap.BrainMethod()
-                newMethod.name = "<init>"
-                newMethod.out = VoidType.instance
-                newMethod.args = method.args
-                newMethod.accessModifier = method.accessModifier
-                newMethod.setParent(method.parent)
+            if (mctx instanceof BrainfrickParser.ActualMethodContext) {
+                if (method instanceof BrainMap.BrainMethod) {
+                    MethodVisitor mv = cw.visitMethod(method.accessModifier, method.name, "(" + method.args.collect { it.desc }.join("") + ")" + method.out.desc, null, null)
+                    parseMethod(mctx.method(), mv, method, type, false)
+                } else if (method instanceof BrainMap.BrainCtor) {
+                    MethodVisitor mv = cw.visitMethod(method.accessModifier, "<init>", "(" + method.args.collect { it.desc }.join("") + ")V", null, null)
+                    BrainMap.BrainMethod newMethod = new BrainMap.BrainMethod()
+                    newMethod.name = "<init>"
+                    newMethod.out = VoidType.instance
+                    newMethod.args = method.args
+                    newMethod.accessModifier = method.accessModifier
+                    newMethod.setParent(method.parent)
 
-                if (method.superCtor != null) {
-                    newMethod.superMethod = new BrainMap.BrainMethod.SuperMethod()
-                    newMethod.superMethod.args = method.superCtor.args
-                    newMethod.superMethod.out = VoidType.instance
-                    newMethod.superMethod.name = "<init>"
-                    newMethod.superMethod.type = method.superCtor.type
+                    if (method.superCtor != null) {
+                        newMethod.superMethod = new BrainMap.BrainMethod.SuperMethod()
+                        newMethod.superMethod.args = method.superCtor.args
+                        newMethod.superMethod.out = VoidType.instance
+                        newMethod.superMethod.name = "<init>"
+                        newMethod.superMethod.type = method.superCtor.type
+                    }
+
+                    parseMethod(mctx.method(), mv, newMethod, type, true)
                 }
-
-                parseMethod(mctx.method(), mv, newMethod, type, true)
+            } else if (mctx instanceof BrainfrickParser.AbstractMethodContext) {
+                if (method instanceof BrainMap.BrainMethod) {
+                    MethodVisitor mv = cw.visitMethod(method.accessModifier | Opcodes.ACC_ABSTRACT, method.name, "(" + method.args.collect { it.desc }.join("") + ")" + method.out.desc, null, null)
+                    mv.visitEnd()
+                } else if (method instanceof BrainMap.BrainCtor) {
+                    throw new IllegalArgumentException("Attempted to abstractly define constructor")
+                }
+            } else if (mctx instanceof BrainfrickParser.SkipMethodContext) {
+                //Skip this method
             }
         }
 
@@ -146,24 +162,10 @@ class Compiler {
                     arg = method.args.get(i-1)
             } else
                 arg = method.args.get(i)
-            if (arg instanceof PrimitiveType) {
-                switch (arg) {
-                    case PrimitiveType.INT -> mv.visitVarInsn(Opcodes.ILOAD, i)
-                    case PrimitiveType.SHORT -> mv.visitVarInsn(Opcodes.ILOAD, i)
-                    case PrimitiveType.BYTE -> mv.visitVarInsn(Opcodes.ILOAD, i)
-                    case PrimitiveType.CHAR -> mv.visitVarInsn(Opcodes.ILOAD, i)
-                    case PrimitiveType.LONG -> mv.visitVarInsn(Opcodes.LLOAD, i)
-                    case PrimitiveType.FLOAT -> mv.visitVarInsn(Opcodes.FLOAD, i)
-                    case PrimitiveType.DOUBLE -> mv.visitVarInsn(Opcodes.DLOAD, i)
-                    case PrimitiveType.BOOLEAN -> mv.visitVarInsn(Opcodes.ILOAD, i)
-                }
-                arg.castAsObject(mv)
-            } else if (arg instanceof ObjectType) {
-                if (i==0 && isinit) {
-                    mv.visitInsn(Opcodes.ACONST_NULL)
-                } else {
-                    mv.visitVarInsn(Opcodes.ALOAD, i)
-                }
+            if (i==0 && isinit) {
+                mv.visitInsn(Opcodes.ACONST_NULL)
+            } else {
+                arg.readArg(mv, i)
             }
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "add", "(L${OBJECT_NAME};)Z", true)
             mv.visitInsn(Opcodes.POP)

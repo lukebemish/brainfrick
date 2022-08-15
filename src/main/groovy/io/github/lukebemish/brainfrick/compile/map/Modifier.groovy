@@ -10,7 +10,8 @@ enum Modifier {
     PRIVATE(Opcodes.ACC_PRIVATE),
     PUBLIC(Opcodes.ACC_PUBLIC),
     STATIC(Opcodes.ACC_STATIC),
-    FINAL(Opcodes.ACC_FINAL)
+    FINAL(Opcodes.ACC_FINAL),
+    ABSTRACT(Opcodes.ACC_ABSTRACT)
 
     final int accessModifier
     Modifier(int accessModifier) {
@@ -28,6 +29,8 @@ enum Modifier {
             return STATIC
         else if (ctx.FINAL() !== null)
             return FINAL
+        else if (ctx.ABSTRACT() !== null)
+            return ABSTRACT
     }
 
     static Set<Modifier> parse(List<ModifierContext> ctxs) {

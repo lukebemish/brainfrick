@@ -3,6 +3,7 @@ package io.github.lukebemish.brainfrick.test
 import io.github.lukebemish.brainfrick.compile.MultipleCompiler
 
 import java.nio.file.Path
+import java.util.function.Function
 
 class TestFull {
     static Path OUTPATH = Path.of("build/test")
@@ -14,9 +15,17 @@ class TestFull {
 
         Path classPath = OUTPATH
         ClassLoader cl = new URLClassLoader(new URL[] {classPath.toUri().toURL()})
-        Class<?> test1 = cl.loadClass("brainfrick.test.Test1")
-        println test1.getConstructor().newInstance()
-        println test1.getMethod("add",int.class,int.class).invoke(null, 3,5)
-        println test1.getMethod("add2",int.class).invoke(null, 3)
+        println "TestAdd:"
+        Class<?> testAdd = cl.loadClass("brainfrick.test.TestAdd")
+        println testAdd.getConstructor().newInstance()
+        println testAdd.getMethod("add",int.class,int.class).invoke(null, 3,5)
+        println testAdd.getMethod("add2",int.class).invoke(null, 3)
+        println "TestExtend:"
+        Class<?> testExtend = cl.loadClass("brainfrick.test.TestExtend")
+        Function newFunction = testExtend.getConstructor().newInstance() as Function
+        println newFunction.apply(5)
+        println "TestMain:"
+        Class<?> testMain = cl.loadClass("brainfrick.test.TestMain")
+        testMain.getMethod("main", String.class.arrayType()).invoke(null, new Object[]{new String[]{}})
     }
 }

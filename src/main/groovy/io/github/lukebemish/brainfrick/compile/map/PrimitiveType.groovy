@@ -34,4 +34,19 @@ enum PrimitiveType implements ArgType, ReturnType {
         String methodDesc = "(${desc})Ljava/lang/Object;"
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, InvocationUtils.class.name.replace('.','/'),methodName, methodDesc, false)
     }
+
+    @Override
+    void readArg(MethodVisitor mv, int i) {
+        switch (this) {
+            case INT -> mv.visitVarInsn(Opcodes.ILOAD, i)
+            case SHORT -> mv.visitVarInsn(Opcodes.ILOAD, i)
+            case BYTE -> mv.visitVarInsn(Opcodes.ILOAD, i)
+            case CHAR -> mv.visitVarInsn(Opcodes.ILOAD, i)
+            case LONG -> mv.visitVarInsn(Opcodes.LLOAD, i)
+            case FLOAT -> mv.visitVarInsn(Opcodes.FLOAD, i)
+            case DOUBLE -> mv.visitVarInsn(Opcodes.DLOAD, i)
+            case BOOLEAN -> mv.visitVarInsn(Opcodes.ILOAD, i)
+        }
+        this.castAsObject(mv)
+    }
 }

@@ -1,0 +1,8 @@
+public class brainfrick.test.TestMain
+    static public void main(java.lang.String[])
+    public new() -> java.lang.Object new()
+class java.lang.System
+    static get java.io.PrintStream out
+class java.io.PrintStream
+    void println(int)
+class java.lang.Object

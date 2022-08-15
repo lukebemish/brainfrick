@@ -37,7 +37,11 @@ class MultipleCompiler {
             compiler.outdir = outputDir
             compiler.map = brainMap
             ctx.class_().each {
-                compiler.parseClass(it)
+                if (it instanceof BrainfrickParser.ActualClassContext) {
+                    compiler.parseClass(it)
+                } else if (it instanceof BrainfrickParser.SkipClassContext) {
+                    compiler.skipClass()
+                }
             }
         }
     }

@@ -9,8 +9,11 @@ type        : modifier* interface #interfaceType
             | modifier* class #classType
             ;
 
-interface   : INTERFACE name ('.' name)* target* ;
-class       : CLASS name ('.' name)* target* ;
+interface   : INTERFACE name ('.' name)* (EXTENDS implementDef)? target* ;
+class       : CLASS name ('.' name)* (IMPLEMENTS implementDef)? (EXTENDS extendDef)? (IMPLEMENTS implementDef)? target* ;
+
+extendDef   : classname ;
+implementDef: classname (',' classname)* ;
 
 target      : ctor #ctorTarget
             | method #methodTarget
@@ -31,16 +34,17 @@ modifier    : PROTECTED
             | PUBLIC
             | STATIC
             | FINAL
+            | ABSTRACT
             ;
 
 
-argName     : primitive #primitiveArg
-            | name ('.' name)* # objArg
+argName     : primitive '[]'* #primitiveArg
+            | name ('.' name)* '[]'* #objArg
             ;
 
-returnName  : primitive #primitiveOut
+returnName  : primitive '[]'* #primitiveOut
             | VOID #voidOut
-            | name ('.' name)* # objOut
+            | name ('.' name)* '[]'* # objOut
             ;
 
 primitive   : INT
@@ -64,6 +68,9 @@ name        : CLASS
             | PUT
             | STATIC
             | NEW
+            | EXTENDS
+            | IMPLEMENTS
+            | ABSTRACT
             | NAME
             ;
 
@@ -85,8 +92,14 @@ PUT
     : 'put' ;
 STATIC
     : 'static' ;
+ABSTRACT
+    : 'abstract' ;
 NEW
     : 'new' ;
+EXTENDS
+    : 'extends' ;
+IMPLEMENTS
+    : 'implements' ;
 
 COMMA
     : ',' ;
@@ -98,6 +111,8 @@ RPAREN
     : ')' ;
 SUPER
     : '->' ;
+ARRAY
+    : '[]' ;
 
 BOOL
     : 'bool' ;

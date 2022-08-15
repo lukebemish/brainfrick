@@ -17,6 +17,10 @@ class ObjectType implements ArgType, ReturnType {
         this.name = names.join('/')
     }
 
+    ObjectType(@NotNull Class<?> clazz) {
+        this(clazz.getName().split('\\.').toList())
+    }
+
     @Override
     void castTo(MethodVisitor mv) {
         mv.visitTypeInsn(Opcodes.CHECKCAST, names.join('/'))
@@ -40,5 +44,10 @@ class ObjectType implements ArgType, ReturnType {
 
     int hashCode() {
         return names.hashCode()
+    }
+
+    @Override
+    void readArg(MethodVisitor mv, int idx) {
+        mv.visitVarInsn(Opcodes.ALOAD, idx)
     }
 }

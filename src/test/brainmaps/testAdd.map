@@ -1,4 +1,4 @@
-public class brainfrick.test.Test1
+public class brainfrick.test.TestAdd
     static public int add(int,int)
     static public int add2(int)
     public new() -> java.lang.Object new()
