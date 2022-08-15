@@ -265,14 +265,16 @@ class Compiler {
                     int argCount = s.args.size()+1
                     if (isinit)
                         argCount--
-                    mv.visitVarInsn(Opcodes.ALOAD, cells + 2)
-                    mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, BrainMapCompiler.LIST_NAME, "size", "()I", true)
-                    mv.visitInsn(Opcodes.DUP)
-                    BrainMapCompiler.constantInt(mv, argCount)
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, BrainMapCompiler.BUFFER_UTILS_NAME, BrainMapCompiler.CHECK_ENOUGH, BrainMapCompiler.CHECK_ENOUGH_DESC, false)
-                    BrainMapCompiler.constantInt(mv, -argCount)
-                    mv.visitInsn(Opcodes.IADD)
-                    mv.visitVarInsn(Opcodes.ISTORE,cells+4)
+                    if (argCount!=0) {
+                        mv.visitVarInsn(Opcodes.ALOAD, cells + 2)
+                        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, BrainMapCompiler.LIST_NAME, "size", "()I", true)
+                        mv.visitInsn(Opcodes.DUP)
+                        BrainMapCompiler.constantInt(mv, argCount)
+                        mv.visitMethodInsn(Opcodes.INVOKESTATIC, BrainMapCompiler.BUFFER_UTILS_NAME, BrainMapCompiler.CHECK_ENOUGH, BrainMapCompiler.CHECK_ENOUGH_DESC, false)
+                        BrainMapCompiler.constantInt(mv, -argCount)
+                        mv.visitInsn(Opcodes.IADD)
+                        mv.visitVarInsn(Opcodes.ISTORE, cells + 4)
+                    }
                     for (int i = 0; i < s.args.size()+1; i++) {
                         if (i==0 && isinit) {
                             mv.visitVarInsn(Opcodes.ALOAD, 0)

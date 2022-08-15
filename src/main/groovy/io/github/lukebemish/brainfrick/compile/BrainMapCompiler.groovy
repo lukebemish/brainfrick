@@ -67,15 +67,16 @@ class BrainMapCompiler {
         if ((method.accessModifier & Opcodes.ACC_STATIC) == 0)
             size+=1
 
-
-        mv.visitVarInsn(Opcodes.ALOAD,0)
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
-        mv.visitInsn(Opcodes.DUP)
-        constantInt(mv, size)
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-        constantInt(mv, -size)
-        mv.visitInsn(Opcodes.IADD)
-        mv.visitVarInsn(Opcodes.ISTORE,1)
+        if (size!=0) {
+            mv.visitVarInsn(Opcodes.ALOAD, 0)
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
+            mv.visitInsn(Opcodes.DUP)
+            constantInt(mv, size)
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
+            constantInt(mv, -size)
+            mv.visitInsn(Opcodes.IADD)
+            mv.visitVarInsn(Opcodes.ISTORE, 1)
+        }
 
         if ((method.accessModifier & Opcodes.ACC_STATIC) == 0) {
             ArgType type = parent.type
@@ -195,14 +196,16 @@ class BrainMapCompiler {
         ctor.args.each {callDesc.append(it.desc)}
         callDesc.append(')V')
 
-        mv.visitVarInsn(Opcodes.ALOAD,0)
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
-        mv.visitInsn(Opcodes.DUP)
-        constantInt(mv, ctor.args.size())
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-        constantInt(mv, -ctor.args.size())
-        mv.visitInsn(Opcodes.IADD)
-        mv.visitVarInsn(Opcodes.ISTORE,1)
+        if (ctor.args.size()!=0) {
+            mv.visitVarInsn(Opcodes.ALOAD, 0)
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "size", "()I", true)
+            mv.visitInsn(Opcodes.DUP)
+            constantInt(mv, ctor.args.size())
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
+            constantInt(mv, -ctor.args.size())
+            mv.visitInsn(Opcodes.IADD)
+            mv.visitVarInsn(Opcodes.ISTORE, 1)
+        }
 
         mv.visitTypeInsn(Opcodes.NEW, parent.type.names.join('/'))
         mv.visitInsn(Opcodes.DUP)
