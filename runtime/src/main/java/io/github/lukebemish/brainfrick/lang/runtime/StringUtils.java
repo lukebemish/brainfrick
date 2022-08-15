@@ -7,8 +7,11 @@ public final class StringUtils {
 
     @SuppressWarnings("rawtypes")
     public static String fromChars(List list) {
-        if (list.get(list.size()-1) instanceof String s)
+        Object first = list.get(list.size()-1);
+        if (first instanceof String s)
             return s;
+        else if (first==null)
+            return null;
         else {
             char[] chars = new char[list.size()];
             int counter = 0;
