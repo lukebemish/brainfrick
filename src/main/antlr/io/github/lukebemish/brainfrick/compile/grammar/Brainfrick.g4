@@ -49,6 +49,8 @@ RETURN:     '/' ;
 
 MULTI_COMMENT
     : '/*' .*? '*/' -> skip ;
+LINE_COMMENT
+    : '//' ~[\r\n]* -> skip ;
 UNKNOWN
     : .+? -> skip ;
 
