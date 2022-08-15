@@ -22,7 +22,7 @@ abstract public class brainfrick.test.TestField
   static get java.lang.String staticString
   // Setters are defined with "put":
   put java.lang.Object storedObject
-  abstract java.lang.Object someMethod
+  abstract java.lang.Object someMethod()
 ```
 
 Brainmaps are referenced at the beginning of a brainfrick source file, and are integrated into classes at compile time. For instance, if the previous
