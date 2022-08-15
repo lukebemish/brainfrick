@@ -1,5 +1,8 @@
 package io.github.lukebemish.brainfrick.lang.runtime;
 
+import io.github.lukebemish.brainfrick.lang.Numberlike;
+import io.github.lukebemish.brainfrick.lang.Zeroable;
+
 public final class InvocationUtils {
     private InvocationUtils() {}
 
@@ -21,6 +24,10 @@ public final class InvocationUtils {
             return Boolean.TRUE.equals(bool)?(short)1:0;
         else if (obj == null)
             return 0;
+        else if (obj instanceof Numberlike i)
+            return i.getShort();
+        else if (obj instanceof Zeroable z && z.isZero())
+            return 0;
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not short-like.");
     }
 
@@ -32,6 +39,10 @@ public final class InvocationUtils {
         else if (obj instanceof Boolean bool)
             return Boolean.TRUE.equals(bool)?(byte)1:0;
         else if (obj == null)
+            return 0;
+        else if (obj instanceof Numberlike i)
+            return i.getByte();
+        else if (obj instanceof Zeroable z && z.isZero())
             return 0;
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not byte-like.");
     }
@@ -45,6 +56,10 @@ public final class InvocationUtils {
             return Boolean.TRUE.equals(bool)?(char)1:0;
         else if (obj == null)
             return 0;
+        else if (obj instanceof Numberlike i)
+            return i.getChar();
+        else if (obj instanceof Zeroable z && z.isZero())
+            return 0;
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not char-like.");
     }
 
@@ -56,6 +71,10 @@ public final class InvocationUtils {
         else if (obj instanceof Boolean bool)
             return Boolean.TRUE.equals(bool)?1:0;
         else if (obj == null)
+            return 0;
+        else if (obj instanceof Numberlike i)
+            return i.getLong();
+        else if (obj instanceof Zeroable z && z.isZero())
             return 0;
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not long-like.");
     }
@@ -69,6 +88,10 @@ public final class InvocationUtils {
             return Boolean.TRUE.equals(bool)?1:0;
         else if (obj == null)
             return 0;
+        else if (obj instanceof Numberlike i)
+            return i.getFloat();
+        else if (obj instanceof Zeroable z && z.isZero())
+            return 0;
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not float-like.");
     }
 
@@ -81,6 +104,10 @@ public final class InvocationUtils {
             return Boolean.TRUE.equals(bool)?1:0;
         else if (obj == null)
             return 0;
+        else if (obj instanceof Numberlike i)
+            return i.getDouble();
+        else if (obj instanceof Zeroable z && z.isZero())
+            return 0;
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not double-like.");
     }
 
@@ -91,6 +118,8 @@ public final class InvocationUtils {
             return d!=0;
         else if (obj instanceof Float f)
             return f!=0;
+        else if (obj instanceof Zeroable i)
+            return !i.isZero();
         try {
             return asI(obj) != 0;
         } catch (ImproperTypeException ignored) {

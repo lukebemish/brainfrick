@@ -1,7 +1,6 @@
 package io.github.lukebemish.brainfrick.lang.runtime;
 
-import io.github.lukebemish.brainfrick.lang.Decrementable;
-import io.github.lukebemish.brainfrick.lang.Incrementable;
+import io.github.lukebemish.brainfrick.lang.*;
 
 import java.util.Arrays;
 
@@ -72,6 +71,8 @@ public class Cells {
             return Boolean.TRUE.equals(bool)?1:0;
         else if (obj == null)
             return 0;
+        else if (obj instanceof Numberlike i)
+            return i.getInt();
         throw new ImproperTypeException("Object of type "+obj.getClass()+" is not integer-like.");
     }
 
@@ -93,6 +94,8 @@ public class Cells {
             return l==0;
         else if (obj instanceof Boolean b)
             return Boolean.FALSE.equals(b);
+        else if (obj instanceof Zeroable z)
+            return z.isZero();
         return false;
     }
 
