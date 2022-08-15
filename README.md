@@ -56,8 +56,8 @@ The code itself is an extended version of normal brainfuck syntax:
 | ------- | ----------- |
 | `>` | Moves the pointer one to the right. Pointer locations can be any integer value. |
 | `<` | Moves the pointer one to the left |
-| `+` | Increments the pointed to location by one. Numbers will be increased by one, 'null` will become `1`, `false` will become `true`, and objects that implement `Incrementable` will be incremented. |
-| `-` | Decrements the pointed to location by one. Numbers will be decreased by one, 'null` will become `-1`, `true` will become `false`, and objects that implement `Decrementable` will be decremented. |
+| `+` | Increments the pointed to location by one. Numbers will be increased by one, `null` will become `1`, `false` will become `true`, and objects that implement `Incrementable` will be incremented. |
+| `-` | Decrements the pointed to location by one. Numbers will be decreased by one, `null` will become `-1`, `true` will become `false`, and objects that implement `Decrementable` will be decremented. |
 | `[` | If the value at the pointer is zero-like (zero, `false`, or `null`), jumps to after the matching `]` instruction. |
 | `]` | If the value at the pointer is not zero-like, jumps to after the matching `[` instruction. |
 | `,` | Using the value at the pointer as an index, gets an argument of the method and fills the pointed cell with it. |
