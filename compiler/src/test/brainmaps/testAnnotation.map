@@ -1,7 +1,7 @@
 @io.github.lukebemish.brainfrick.annotations.Test1(value = "Test")
 public class brainfrick.test.TestAnnotation
     @io.github.lukebemish.brainfrick.annotations.Test2
-    static public void test(@io.github.lukebemish.brainfrick.annotations.Test1(ints={1,2,3},clazz=brainfrick.test.TestAnnotation) java.lang.String)
+    static public void test(@io.github.lukebemish.brainfrick.annotations.Test3(ints={1,2,3},clazz=brainfrick.test.TestAnnotation) java.lang.String)
     @io.github.lukebemish.brainfrick.annotations.Test4(test = @io.github.lukebemish.brainfrick.annotations.Test1(value = "Test2"))
     public new() -> java.lang.Object new()
 class java.lang.Object
