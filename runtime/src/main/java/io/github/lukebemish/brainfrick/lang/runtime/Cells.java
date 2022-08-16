@@ -108,60 +108,70 @@ public final class Cells {
         return false;
     }
 
-    public void incr(int idx) {
-        Object obj = get(idx);
-        Object toSet;
-        if (obj == null)
-            toSet = 1;
-        else if (obj instanceof Integer i)
-            toSet = i+1;
-        else if (obj instanceof Short s)
-            toSet = s+1;
-        else if (obj instanceof Byte b)
-            toSet = b+1;
-        else if (obj instanceof Character c)
-            toSet = (char)(c+1);
-        else if (obj instanceof Long l)
-            toSet = l+1;
-        else if (obj instanceof Float f)
-            toSet = f+1;
-        else if (obj instanceof Double d)
-            toSet = d+1;
-        else if (obj instanceof Boolean b)
-            toSet = Boolean.FALSE.equals(b)?Boolean.TRUE:2;
-        else if (obj instanceof Incrementable incrementable)
-            toSet = incrementable.incr();
-        else
-            throw new UnsupportedOperationException(String.format("Objects of type %s do not support incrementing",obj.getClass()));
-        set(idx,toSet);
+    public void incr(int idx, int amount) {
+        set(idx,incr(get(idx),amount));
     }
 
-    public void decr(int idx) {
-        Object obj = get(idx);
+    public static Object incr(Object obj, int amount) {
         Object toSet;
         if (obj == null)
-            toSet = -1;
+            toSet = amount;
         else if (obj instanceof Integer i)
-            toSet = i-1;
+            toSet = i+amount;
         else if (obj instanceof Short s)
-            toSet = s-1;
+            toSet = s+amount;
         else if (obj instanceof Byte b)
-            toSet = b-1;
+            toSet = b+amount;
         else if (obj instanceof Character c)
-            toSet = (char)(c-1);
+            toSet = (char)(c+amount);
         else if (obj instanceof Long l)
-            toSet = l-1;
+            toSet = l+amount;
         else if (obj instanceof Float f)
-            toSet = f-1;
+            toSet = f+amount;
         else if (obj instanceof Double d)
-            toSet = d-1;
+            toSet = d+amount;
         else if (obj instanceof Boolean b)
-            toSet = Boolean.TRUE.equals(b)?Boolean.FALSE:-1;
-        else if (obj instanceof Decrementable decrementable)
+            toSet = Boolean.FALSE.equals(b)?(amount==1?Boolean.TRUE:amount):amount+1;
+        else if (obj instanceof Incrementable incrementable) {
+            toSet = incrementable.incr();
+            if (amount>1)
+                toSet = incr(toSet, amount-1);
+        } else
+            throw new UnsupportedOperationException(String.format("Objects of type %s do not support incrementing",obj.getClass()));
+        return toSet;
+    }
+
+    public void decr(int idx, int amount) {
+        set(idx,decr(get(idx),amount));
+    }
+
+    public static Object decr(Object obj, int amount) {
+        Object toSet;
+        if (obj == null)
+            toSet = -amount;
+        else if (obj instanceof Integer i)
+            toSet = i-amount;
+        else if (obj instanceof Short s)
+            toSet = s-amount;
+        else if (obj instanceof Byte b)
+            toSet = b-amount;
+        else if (obj instanceof Character c)
+            toSet = (char)(c-amount);
+        else if (obj instanceof Long l)
+            toSet = l-amount;
+        else if (obj instanceof Float f)
+            toSet = f-amount;
+        else if (obj instanceof Double d)
+            toSet = d-amount;
+        else if (obj instanceof Boolean b)
+            toSet = Boolean.TRUE.equals(b)?(amount==1?Boolean.FALSE:1-amount):-amount;
+        else if (obj instanceof Decrementable decrementable) {
             toSet = decrementable.decr();
-        else
+            if (amount>1)
+                toSet = decr(toSet, amount-1);
+        } else
             throw new UnsupportedOperationException(String.format("Objects of type %s do not support decrementing",obj.getClass()));
-        set(idx,toSet);
+        return toSet;
     }
 
     // Internal array utils. Similar to ArraysSupport

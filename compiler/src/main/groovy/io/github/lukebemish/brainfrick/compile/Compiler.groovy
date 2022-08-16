@@ -256,17 +256,19 @@ class Compiler {
                 mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.','/'), "get", "(I)L${OBJECT_NAME};", true)
                 mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "set", "(IL${OBJECT_NAME};)V", false)
             } else if (instr instanceof BrainfrickParser.PincrContext) {
-                mv.visitIincInsn(cells+1,1)
+                mv.visitIincInsn(cells+1,instr.PINCR().size())
             } else if (instr instanceof BrainfrickParser.PdecrContext) {
-                mv.visitIincInsn(cells+1, -1)
+                mv.visitIincInsn(cells+1, -instr.PDECR().size())
             } else if (instr instanceof BrainfrickParser.IncrContext) {
                 mv.visitVarInsn(Opcodes.ALOAD, cells)
                 mv.visitVarInsn(Opcodes.ILOAD, cells+1)
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "incr", "(I)V", false)
+                BrainMapCompiler.constantInt(mv,instr.INCR().size())
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "incr", "(II)V", false)
             } else if (instr instanceof BrainfrickParser.DecrContext) {
                 mv.visitVarInsn(Opcodes.ALOAD, cells)
                 mv.visitVarInsn(Opcodes.ILOAD, cells+1)
-                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "decr", "(I)V", false)
+                BrainMapCompiler.constantInt(mv,instr.DECR().size())
+                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Cells.class.name.replace('.','/'), "decr", "(II)V", false)
             } else if (instr instanceof BrainfrickParser.OperateContext) {
                 mv.visitVarInsn(Opcodes.ALOAD, cells)
                 mv.visitVarInsn(Opcodes.ILOAD, cells+1)

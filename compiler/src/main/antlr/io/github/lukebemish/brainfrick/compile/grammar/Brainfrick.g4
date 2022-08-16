@@ -19,10 +19,10 @@ code        : cond | instr ;
 
 cond        : BEGIN code* END ;
 
-instr       : PINCR #pincr
-            | PDECR #pdecr
-            | INCR #incr
-            | DECR #decr
+instr       : PINCR+ #pincr
+            | PDECR+ #pdecr
+            | INCR+ #incr
+            | DECR+ #decr
             | PULL #pull
             | PUSH #push
             | OPERATE #operate
