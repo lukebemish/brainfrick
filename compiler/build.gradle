@@ -35,3 +35,5 @@ idea {
 }
 
 compileGroovy.dependsOn generateGrammarSource
+sourcesJar.dependsOn generateGrammarSource
+javadocJar.dependsOn generateGrammarSource
