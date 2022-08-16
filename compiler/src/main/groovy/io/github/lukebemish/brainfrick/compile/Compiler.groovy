@@ -33,7 +33,7 @@ class Compiler {
         cw.visit(Opcodes.V17, type.accessModifier, type.type.name,null,type.parent.name,interfaces)
 
         type.annotations.each {
-            var av = cw.visitAnnotation(it.type().desc, true)
+            var av = cw.visitAnnotation(it.type().desc, it.runtime())
             it.values().each {key, val ->
                 val.visitParameter(av,key)
             }
@@ -76,7 +76,7 @@ class Compiler {
         combined.each {
             var fv = cw.visitField(it.accessModifier, it.name, it.type.desc, null, null)
             ((BrainMap.BrainField)combined).findCombined().each {
-                var av = fv.visitAnnotation(it.type().desc, true)
+                var av = fv.visitAnnotation(it.type().desc, it.runtime())
                 it.values().each {key, value ->
                     value.visitParameter(av,key)
                 }

@@ -78,7 +78,7 @@ name        : CLASS
             ;
 
 // Annotation
-annotation  : '@' classname ('(' (assignment (',' assignment)* )? ')')? ;
+annotation  : ('@' | '@?') classname ('(' (assignment (',' assignment)* )? ')')? ;
 assignment  : name '=' assignValue ;
 
 assignValue : simpleValue #annotationSimple
@@ -139,6 +139,8 @@ SUPER
     : '->' ;
 ARRAY
     : '[]' ;
+RUNTIME_HIDDEN_ANNOTATE
+    : '@?' ;
 ANNOTATE
     : '@' ;
 ASSIGN

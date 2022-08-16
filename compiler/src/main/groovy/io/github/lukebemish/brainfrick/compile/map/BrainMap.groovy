@@ -176,7 +176,7 @@ class BrainMap {
 
         void writeAnnotations(MethodVisitor mv) {
             annotations.each {
-                var av = mv.visitAnnotation(it.type().desc, true)
+                var av = mv.visitAnnotation(it.type().desc, it.runtime())
                 it.values().each {key,value ->
                     value.visitParameter(av,key)
                 }
@@ -184,10 +184,11 @@ class BrainMap {
             }
             int[] paramNum = new int[] {0}
             mv.visitAnnotableParameterCount(paramAnnotation.size(), true)
+            mv.visitAnnotableParameterCount(paramAnnotation.size(), false)
             paramAnnotation.each {
                 int oldNum = paramNum[0]
                 it.each {ad ->
-                    var av = mv.visitParameterAnnotation(oldNum, ad.type().desc, true)
+                    var av = mv.visitParameterAnnotation(oldNum, ad.type().desc, ad.runtime())
                     ad.values().each {key,value ->
                         value.visitParameter(av,key)
                     }
@@ -216,7 +217,7 @@ class BrainMap {
 
         void writeAnnotations(MethodVisitor mv) {
             annotations.each {
-                var av = mv.visitAnnotation(it.type().desc, true)
+                var av = mv.visitAnnotation(it.type().desc, it.runtime())
                 it.values().each {key,value ->
                     value.visitParameter(av,key)
                 }
@@ -224,10 +225,11 @@ class BrainMap {
             }
             int[] paramNum = new int[] {0}
             mv.visitAnnotableParameterCount(paramAnnotation.size(), true)
+            mv.visitAnnotableParameterCount(paramAnnotation.size(), false)
             paramAnnotation.each {
                 int oldNum = paramNum[0]
                 it.each {ad ->
-                    var av = mv.visitParameterAnnotation(oldNum, ad.type().desc, true)
+                    var av = mv.visitParameterAnnotation(oldNum, ad.type().desc, ad.runtime())
                     ad.values().each {key,value ->
                         value.visitParameter(av,key)
                     }

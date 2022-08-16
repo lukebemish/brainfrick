@@ -8,12 +8,12 @@ import org.objectweb.asm.AnnotationVisitor
 
 @CompileStatic
 @ImmutableOptions(knownImmutableClasses = [ObjectType])
-record AnnotationDeclaration(ObjectType type, Map<String,AnnotationValue> values) implements AnnotationValue.SimpleAnnotationValue {
+record AnnotationDeclaration(ObjectType type, Map<String,AnnotationValue> values, boolean runtime) implements AnnotationValue.SimpleAnnotationValue {
     static AnnotationDeclaration parse(BrainMapParser.AnnotationContext ctx) {
         ObjectType type = new ObjectType(ctx.classname().name().collect {it.text})
         Map<String, AnnotationValue> values = new HashMap<>()
-        ctx.assignment().each {values.put(it.name().text,AnnotationValue.Parser.parse(it.assignValue()))}
-        return new AnnotationDeclaration(type, values)
+        ctx.assignment().each {values.put(it.name().text, AnnotationValue.Parser.parse(it.assignValue()))}
+        return new AnnotationDeclaration(type, values, ctx.RUNTIME_HIDDEN_ANNOTATE()==null)
     }
 
     @Override
