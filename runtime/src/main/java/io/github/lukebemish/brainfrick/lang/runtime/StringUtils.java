@@ -2,6 +2,10 @@ package io.github.lukebemish.brainfrick.lang.runtime;
 
 import java.util.List;
 
+/**
+ * Contains utility methods used by brainfrick to handle strings. Should be considered an implementation detail, and not
+ * referenced directly.
+ */
 public final class StringUtils {
     private StringUtils() {}
 

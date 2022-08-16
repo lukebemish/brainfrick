@@ -1,9 +1,18 @@
 package io.github.lukebemish.brainfrick.lang.runtime;
 
-import io.github.lukebemish.brainfrick.lang.*;
+import io.github.lukebemish.brainfrick.lang.Decrementable;
+import io.github.lukebemish.brainfrick.lang.Incrementable;
+import io.github.lukebemish.brainfrick.lang.Numberlike;
+import io.github.lukebemish.brainfrick.lang.Zeroable;
 
 import java.util.Arrays;
 
+/**
+ * Holds the structure used to store data during a brainfrick method execution. A method will hold a reference to one of
+ * these, as its first non-argument local variable, as well as an integer that points to a location within it as the
+ * second such local variable. This structure is considered an implementation detail, and should not be initialized or
+ * modified directly as its implementation may change.
+ */
 public final class Cells {
     private static final Object[] EMPTY_DATA = {};
     private static final int DEFAULT_SIZE = 5;

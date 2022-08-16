@@ -4,9 +4,9 @@ grammar Brainfrick;
 package io.github.lukebemish.brainfrick.compile.grammar;
 }
 
-program     : MAP* class* ;
+program     : MAP* class_* ;
 
-class       : DECL_SUPER '{' (method | methodDecl)* '}' #actualClass
+class_       : DECL_SUPER '{' (method | methodDecl)* '}' #actualClass
             | '-' #skipClass
             ;
 methodDecl  : DECL_SUPER method #actualMethod

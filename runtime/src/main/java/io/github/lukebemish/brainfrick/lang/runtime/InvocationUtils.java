@@ -3,6 +3,10 @@ package io.github.lukebemish.brainfrick.lang.runtime;
 import io.github.lukebemish.brainfrick.lang.Numberlike;
 import io.github.lukebemish.brainfrick.lang.Zeroable;
 
+/**
+ * Contains methods used while invoking {@link Caller} instances from a compiled brainmap. Should be considered an
+ * implementation detail, and not referenced directly.
+ */
 public final class InvocationUtils {
     private InvocationUtils() {}
 

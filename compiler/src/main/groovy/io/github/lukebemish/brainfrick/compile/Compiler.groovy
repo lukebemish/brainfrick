@@ -32,6 +32,14 @@ class Compiler {
         String[] interfaces = type.interfaces.collect {it->it.name}.toArray(new String[]{})
         cw.visit(Opcodes.V17, type.accessModifier, type.type.name,null,type.parent.name,interfaces)
 
+        type.annotations.each {
+            var av = cw.visitAnnotation(it.type().desc, true)
+            it.values().each {key, val ->
+                val.visitParameter(av,key)
+            }
+            av.visitEnd()
+        }
+
         BrainMapCompiler mapCompiler = new BrainMapCompiler()
         mapCompiler.classname = type.type.name
         mapCompiler.cw = cw
@@ -66,7 +74,15 @@ class Compiler {
         combined.addAll(instanceFields)
         combined.addAll(staticFields)
         combined.each {
-            cw.visitField(it.accessModifier, it.name, it.type.desc, null, null)
+            var fv = cw.visitField(it.accessModifier, it.name, it.type.desc, null, null)
+            ((BrainMap.BrainField)combined).findCombined().each {
+                var av = fv.visitAnnotation(it.type().desc, true)
+                it.values().each {key, value ->
+                    value.visitParameter(av,key)
+                }
+                av.visitEnd()
+            }
+            fv.visitEnd()
         }
 
         //Methods
@@ -79,9 +95,11 @@ class Compiler {
             if (mctx instanceof BrainfrickParser.ActualMethodContext) {
                 if (method instanceof BrainMap.BrainMethod) {
                     MethodVisitor mv = cw.visitMethod(method.accessModifier, method.name, "(" + method.args.collect { it.desc }.join("") + ")" + method.out.desc, null, null)
+                    method.writeAnnotations(mv)
                     parseMethod(mctx.method(), mv, method, type, false)
                 } else if (method instanceof BrainMap.BrainCtor) {
                     MethodVisitor mv = cw.visitMethod(method.accessModifier, "<init>", "(" + method.args.collect { it.desc }.join("") + ")V", null, null)
+                    method.writeAnnotations(mv)
                     BrainMap.BrainMethod newMethod = new BrainMap.BrainMethod()
                     newMethod.name = "<init>"
                     newMethod.out = VoidType.instance
@@ -102,6 +120,7 @@ class Compiler {
             } else if (mctx instanceof BrainfrickParser.AbstractMethodContext) {
                 if (method instanceof BrainMap.BrainMethod) {
                     MethodVisitor mv = cw.visitMethod(method.accessModifier | Opcodes.ACC_ABSTRACT, method.name, "(" + method.args.collect { it.desc }.join("") + ")" + method.out.desc, null, null)
+                    method.writeAnnotations(mv)
                     mv.visitEnd()
                 } else if (method instanceof BrainMap.BrainCtor) {
                     throw new IllegalArgumentException("Attempted to abstractly define constructor")

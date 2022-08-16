@@ -2,6 +2,8 @@ package io.github.lukebemish.brainfrick.compile.map
 
 import groovy.transform.CompileStatic
 import io.github.lukebemish.brainfrick.compile.grammar.BrainMapParser
+import io.github.lukebemish.brainfrick.compile.map.annotation.AnnotationDeclaration
+import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 
 @CompileStatic
@@ -37,6 +39,7 @@ class BrainMap {
                 type.parent = new ObjectType(ctx.class_().extendDef().classname().name().collect {it.text})
             else
                 type.parent = new ObjectType(Object.class)
+            type.annotations = ctx.annotation().collect {AnnotationDeclaration.parse(it)}
             return type
         } else if (ctx instanceof BrainMapParser.InterfaceTypeContext) {
             var type = new BrainType()
@@ -59,6 +62,7 @@ class BrainMap {
                 type.interfaces = List.of()
             }
             type.parent = new ObjectType(Object.class)
+            type.annotations = ctx.annotation().collect {AnnotationDeclaration.parse(it)}
             return type
         }
     }
@@ -74,20 +78,22 @@ class BrainMap {
 
     static BrainCtor parseBrainCtor(BrainMapParser.CtorContext ctx) {
         BrainCtor ctor = new BrainCtor()
-        ctor.args = ctx.argName().collect {ArgType.Parser.parse(it)}
+        ctor.args = ctx.annotArg().collect{it.argName()}.collect {ArgType.Parser.parse(it)}
         ctor.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
         if (ctx.superCtor() !== null) {
             ctor.superCtor = new BrainCtor.SuperCtor()
             ctor.superCtor.args = ctx.superCtor().argName().collect {ArgType.Parser.parse(it)}
             ctor.superCtor.type = new ObjectType(ctx.superCtor().classname().name().collect {it.text})
         }
+        ctor.annotations = ctx.annotation().collect {AnnotationDeclaration.parse(it)}
+        ctor.paramAnnotation = ctx.annotArg().collect {it.annotation().collect {AnnotationDeclaration.parse(it)}}
         return ctor
     }
 
     static BrainMethod parseBrainMethod(BrainMapParser.MethodContext ctx) {
         BrainMethod method = new BrainMethod()
         method.name = ctx.name().text
-        method.args = ctx.argName().collect {ArgType.Parser.parse(it)}
+        method.args = ctx.annotArg().collect{it.argName()}.collect {ArgType.Parser.parse(it)}
         method.out = ReturnType.Parser.parse(ctx.returnName())
         method.accessModifier = Modifier.access(Modifier.parse(ctx.modifier()))
         if (ctx.superMethod() !== null) {
@@ -97,6 +103,8 @@ class BrainMap {
             method.superMethod.out = ReturnType.Parser.parse(ctx.returnName())
             method.superMethod.type = new ObjectType(ctx.superMethod().classname().name().collect {it.text})
         }
+        method.annotations = ctx.annotation().collect {AnnotationDeclaration.parse(it)}
+        method.paramAnnotation = ctx.annotArg().collect {it.annotation().collect {AnnotationDeclaration.parse(it)}}
         return method
     }
 
@@ -113,6 +121,7 @@ class BrainMap {
             field.type = type
         else if (field instanceof BrainPutter && type instanceof ArgType)
             field.type = type
+        field.annotations = ctx.annotation().collect {AnnotationDeclaration.parse(it)}
         return field
     }
 
@@ -125,6 +134,7 @@ class BrainMap {
         List<ObjectType> interfaces
         boolean isinterface = false
         int accessModifier
+        List<AnnotationDeclaration> annotations = new ArrayList<>()
     }
     
     static trait BrainChild {
@@ -160,6 +170,32 @@ class BrainMap {
             List<ArgType> args
             ObjectType type
         }
+
+        List<List<AnnotationDeclaration>> paramAnnotation = new ArrayList<>()
+        List<AnnotationDeclaration> annotations = new ArrayList<>()
+
+        void writeAnnotations(MethodVisitor mv) {
+            annotations.each {
+                var av = mv.visitAnnotation(it.type().desc, true)
+                it.values().each {key,value ->
+                    value.visitParameter(av,key)
+                }
+                av.visitEnd()
+            }
+            int[] paramNum = new int[] {0}
+            mv.visitAnnotableParameterCount(paramAnnotation.size(), true)
+            paramAnnotation.each {
+                int oldNum = paramNum[0]
+                it.each {ad ->
+                    var av = mv.visitParameterAnnotation(oldNum, ad.type().desc, true)
+                    ad.values().each {key,value ->
+                        value.visitParameter(av,key)
+                    }
+                    av.visitEnd()
+                }
+                paramNum[0]++
+            }
+        }
     }
 
     static class BrainMethod implements BrainChild {
@@ -174,11 +210,41 @@ class BrainMap {
             List<ArgType> args
             ObjectType type
         }
+
+        List<List<AnnotationDeclaration>> paramAnnotation = new ArrayList<>()
+        List<AnnotationDeclaration> annotations = new ArrayList<>()
+
+        void writeAnnotations(MethodVisitor mv) {
+            annotations.each {
+                var av = mv.visitAnnotation(it.type().desc, true)
+                it.values().each {key,value ->
+                    value.visitParameter(av,key)
+                }
+                av.visitEnd()
+            }
+            int[] paramNum = new int[] {0}
+            mv.visitAnnotableParameterCount(paramAnnotation.size(), true)
+            paramAnnotation.each {
+                int oldNum = paramNum[0]
+                it.each {ad ->
+                    var av = mv.visitParameterAnnotation(oldNum, ad.type().desc, true)
+                    ad.values().each {key,value ->
+                        value.visitParameter(av,key)
+                    }
+                    av.visitEnd()
+                }
+                paramNum[0]++
+            }
+        }
     }
 
     static trait BrainField extends BrainChild {
         String name
         abstract ThingType getType()
+        List<AnnotationDeclaration> annotations = new ArrayList<>()
+        List<AnnotationDeclaration> findCombined() {
+            return parent.children.findAll {it instanceof BrainField && it.name==this.name}.collectMany {((BrainField)it).annotations}
+        }
     }
 
     static class BrainPutter implements BrainField {

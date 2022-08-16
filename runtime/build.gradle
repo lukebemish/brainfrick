@@ -5,3 +5,11 @@ archivesBaseName = "brainfrick-runtime"
 repositories {
     mavenCentral()
 }
+
+dependencies {
+    implementation 'org.jetbrains:annotations:23.0.0'
+}
+
+repositories {
+    mavenCentral()
+}
