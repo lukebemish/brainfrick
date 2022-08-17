@@ -8,13 +8,13 @@ package io.github.lukebemish.brainfrick.lang;
 public interface Numberlike extends Zeroable {
     /**
      * Gets an integer representation of the object.
-     * @return an integer representation of the object to be used for indexing or unboxing
+     * @return an integer representation of the object to be used for indexing or unboxing.
      */
     int getInt();
 
     /**
      * Gets a short representation of the object.
-     * @return a short representation of the object to be used for unboxing
+     * @return a short representation of the object to be used for unboxing.
      */
     default short getShort() {
         return (short)getInt();
@@ -22,7 +22,7 @@ public interface Numberlike extends Zeroable {
 
     /**
      * Gets a byte representation of the object.
-     * @return a byte representation of the object to be used for unboxing
+     * @return a byte representation of the object to be used for unboxing.
      */
     default byte getByte() {
         return (byte)getInt();
@@ -30,7 +30,7 @@ public interface Numberlike extends Zeroable {
 
     /**
      * Gets a char representation of the object.
-     * @return a char representation of the object to be used for unboxing
+     * @return a char representation of the object to be used for unboxing.
      */
     default char getChar() {
         return (char)getInt();
@@ -38,7 +38,7 @@ public interface Numberlike extends Zeroable {
 
     /**
      * Gets a long representation of the object.
-     * @return a long representation of the object to be used for unboxing
+     * @return a long representation of the object to be used for unboxing.
      */
     default long getLong() {
         return getInt();
@@ -46,7 +46,7 @@ public interface Numberlike extends Zeroable {
 
     /**
      * Gets a float representation of the object.
-     * @return a float representation of the object to be used for unboxing
+     * @return a float representation of the object to be used for unboxing.
      */
     default float getFloat() {
         return getInt();
@@ -54,7 +54,7 @@ public interface Numberlike extends Zeroable {
 
     /**
      * Gets a double representation of the object.
-     * @return a double representation of the object to be used for unboxing
+     * @return a double representation of the object to be used for unboxing.
      */
     default double getDouble() {
         return getFloat();

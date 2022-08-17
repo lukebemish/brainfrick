@@ -4,6 +4,8 @@ import io.github.lukebemish.brainfrick.lang.Decrementable;
 import io.github.lukebemish.brainfrick.lang.Incrementable;
 import io.github.lukebemish.brainfrick.lang.Numberlike;
 import io.github.lukebemish.brainfrick.lang.Zeroable;
+import io.github.lukebemish.brainfrick.lang.exception.ImproperTypeException;
+import io.github.lukebemish.brainfrick.lang.exception.UnsupportedCellOperationException;
 
 import java.util.Arrays;
 
@@ -82,7 +84,7 @@ public final class Cells {
             return 0;
         else if (obj instanceof Numberlike i)
             return i.getInt();
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not integer-like.");
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not integer-like.",obj.getClass(),int.class);
     }
 
     public int asInt(int idx) {
@@ -137,7 +139,7 @@ public final class Cells {
             if (amount>1)
                 toSet = incr(toSet, amount-1);
         } else
-            throw new UnsupportedOperationException(String.format("Objects of type %s do not support incrementing",obj.getClass()));
+            throw new UnsupportedCellOperationException(String.format("Objects of type %s do not support incrementing",obj.getClass()));
         return toSet;
     }
 
@@ -170,7 +172,7 @@ public final class Cells {
             if (amount>1)
                 toSet = decr(toSet, amount-1);
         } else
-            throw new UnsupportedOperationException(String.format("Objects of type %s do not support decrementing",obj.getClass()));
+            throw new UnsupportedCellOperationException(String.format("Objects of type %s do not support decrementing",obj.getClass()));
         return toSet;
     }
 

@@ -2,6 +2,8 @@ package io.github.lukebemish.brainfrick.lang.runtime;
 
 import io.github.lukebemish.brainfrick.lang.Numberlike;
 import io.github.lukebemish.brainfrick.lang.Zeroable;
+import io.github.lukebemish.brainfrick.lang.exception.BufferTooSmallException;
+import io.github.lukebemish.brainfrick.lang.exception.ImproperTypeException;
 
 /**
  * Contains methods used while invoking {@link Caller} instances from a compiled brainmap. Should be considered an
@@ -12,7 +14,7 @@ public final class InvocationUtils {
 
     public static void checkEnough(int size, int needed) {
         if (size < needed)
-            throw new BufferTooSmallException("Buffer contains "+size+" elements; "+needed+" needed.");
+            throw new BufferTooSmallException("Buffer contains "+size+" elements; "+needed+" needed.",needed,size);
     }
 
     public static int asI(Object object) {
@@ -32,7 +34,7 @@ public final class InvocationUtils {
             return i.getShort();
         else if (obj instanceof Zeroable z && z.isZero())
             return 0;
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not short-like.");
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not short-like.",obj.getClass(),short.class);
     }
 
     public static byte asB(Object obj) {
@@ -48,7 +50,7 @@ public final class InvocationUtils {
             return i.getByte();
         else if (obj instanceof Zeroable z && z.isZero())
             return 0;
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not byte-like.");
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not byte-like.",obj.getClass(),byte.class);
     }
 
     public static char asC(Object obj) {
@@ -64,7 +66,9 @@ public final class InvocationUtils {
             return i.getChar();
         else if (obj instanceof Zeroable z && z.isZero())
             return 0;
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not char-like.");
+        else if (obj instanceof String s && s.length()==1)
+            return s.charAt(0);
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not char-like.",obj.getClass(),char.class);
     }
 
     public static long asJ(Object obj) {
@@ -80,7 +84,7 @@ public final class InvocationUtils {
             return i.getLong();
         else if (obj instanceof Zeroable z && z.isZero())
             return 0;
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not long-like.");
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not long-like.",obj.getClass(),long.class);
     }
 
     public static float asF(Object obj) {
@@ -96,7 +100,7 @@ public final class InvocationUtils {
             return i.getFloat();
         else if (obj instanceof Zeroable z && z.isZero())
             return 0;
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not float-like.");
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not float-like.",obj.getClass(),float.class);
     }
 
     public static double asD(Object obj) {
@@ -112,7 +116,7 @@ public final class InvocationUtils {
             return i.getDouble();
         else if (obj instanceof Zeroable z && z.isZero())
             return 0;
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not double-like.");
+        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not double-like.",obj.getClass(),double.class);
     }
 
     public static boolean asZ(Object obj) {
