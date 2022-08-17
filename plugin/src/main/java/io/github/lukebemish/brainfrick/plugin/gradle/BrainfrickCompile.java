@@ -1,24 +1,21 @@
 package io.github.lukebemish.brainfrick.plugin.gradle;
 
 import io.github.lukebemish.brainfrick.compile.MultipleCompiler;
-import org.gradle.api.internal.tasks.compile.CompilerForkUtils;
-import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.compile.AbstractCompile;
-import org.gradle.api.tasks.compile.CompileOptions;
 import org.gradle.work.InputChanges;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Allows for compilation of brainfrick source files. Though brainmaps may be included in the source set, only the
+ * brainfrick source files themselves will be compiled; brainmaps are specified by relative file path.
+ */
 public class BrainfrickCompile extends AbstractCompile {
-    private final CompileOptions compileOptions;
-    private final ObjectFactory objectFactory = this.getProject().getObjects();
 
     public BrainfrickCompile() {
-        this.compileOptions = this.objectFactory.newInstance(CompileOptions.class);
-        CompilerForkUtils.doNotCacheIfForkingViaExecutable(this.compileOptions, this.getOutputs());
     }
 
     @TaskAction

@@ -1,9 +1,10 @@
 plugins {
     id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '1.0.0'
 }
 
-group 'io.github.lukebemish.brainfrick'
-version '1.0-SNAPSHOT'
+version '1.0.0'
 archivesBaseName = "brainfrick-plugin"
 
 repositories {
@@ -24,12 +25,22 @@ tasks.withType(JavaCompile) {
     source(project(":runtime").sourceSets.main.allSource)
 }
 
+pluginBundle {
+    website = 'https://github.com/lukebemish/brainfrick'
+    vcsUrl = 'https://github.com/lukebemish/brainfrick'
+    tags = ['brainfrick']
+}
+
 gradlePlugin {
     plugins {
         simplePlugin {
-            id = 'io.github.lukebemish.brainfrick.plugin'
+            id = 'io.github.lukebemish.brainfrick'
+            displayName = "Brainfrick Plugin"
+            description = "Plugin supporting compilation of brainfrick code and brainmaps"
             implementationClass = 'io.github.lukebemish.brainfrick.plugin.gradle.BrainfrickBasePlugin'
         }
     }
 }
+
+
 
