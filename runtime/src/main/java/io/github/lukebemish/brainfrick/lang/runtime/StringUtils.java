@@ -1,7 +1,5 @@
 package io.github.lukebemish.brainfrick.lang.runtime;
 
-import io.github.lukebemish.brainfrick.lang.exception.BufferTooSmallException;
-
 import java.util.List;
 
 /**
@@ -17,7 +15,7 @@ public final class StringUtils {
      * @param list The buffer to assemble a string from.
      * @return A string to be returned by the brainfrick method.
      * @exception BufferTooSmallException if the buffer does not contain at least one item.
-     * @exception io.github.lukebemish.brainfrick.lang.exception.ImproperTypeException if a member of the buffer cannot
+     * @exception ImproperTypeException if a member of the buffer cannot
      * be converted to a character.
      */
     @SuppressWarnings("rawtypes")

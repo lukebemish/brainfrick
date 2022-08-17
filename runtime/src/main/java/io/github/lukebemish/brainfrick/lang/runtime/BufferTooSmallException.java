@@ -1,4 +1,4 @@
-package io.github.lukebemish.brainfrick.lang.exception;
+package io.github.lukebemish.brainfrick.lang.runtime;
 
 /**
  * An exception thrown to indicate that the buffer of values available when brainfrick attempts to call a callable was

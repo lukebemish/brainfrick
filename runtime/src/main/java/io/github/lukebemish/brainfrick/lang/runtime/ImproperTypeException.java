@@ -1,4 +1,4 @@
-package io.github.lukebemish.brainfrick.lang.exception;
+package io.github.lukebemish.brainfrick.lang.runtime;
 
 /**
  * An exception thrown to indicate that a type cannot be unboxed into another type. Differs from a

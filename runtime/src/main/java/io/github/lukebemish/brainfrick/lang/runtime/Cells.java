@@ -3,7 +3,6 @@ package io.github.lukebemish.brainfrick.lang.runtime;
 import io.github.lukebemish.brainfrick.lang.Decrementable;
 import io.github.lukebemish.brainfrick.lang.Incrementable;
 import io.github.lukebemish.brainfrick.lang.Zeroable;
-import io.github.lukebemish.brainfrick.lang.exception.UnsupportedCellOperationException;
 
 import java.util.Arrays;
 
@@ -88,7 +87,7 @@ public final class Cells {
      * Gets an integer representation of the object at a given index, to be used during the ':' or ',' operations.
      * @param idx The index to get an integer representation of.
      * @return An integer representation of the element at the given index.
-     * @exception io.github.lukebemish.brainfrick.lang.exception.ImproperTypeException if the value cannot be unboxed or
+     * @exception ImproperTypeException if the value cannot be unboxed or
      * converted to an int
      * @see io.github.lukebemish.brainfrick.lang.Numberlike
      */

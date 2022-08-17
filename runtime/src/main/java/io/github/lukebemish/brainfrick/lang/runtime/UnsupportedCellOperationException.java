@@ -1,4 +1,4 @@
-package io.github.lukebemish.brainfrick.lang.exception;
+package io.github.lukebemish.brainfrick.lang.runtime;
 
 /**
  * An exception thrown to indicate that a given brainfrick operation (such as incrementation or decrementing) cannot be

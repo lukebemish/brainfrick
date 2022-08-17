@@ -2,8 +2,6 @@ package io.github.lukebemish.brainfrick.lang.runtime;
 
 import io.github.lukebemish.brainfrick.lang.Numberlike;
 import io.github.lukebemish.brainfrick.lang.Zeroable;
-import io.github.lukebemish.brainfrick.lang.exception.BufferTooSmallException;
-import io.github.lukebemish.brainfrick.lang.exception.ImproperTypeException;
 
 /**
  * Contains methods used while invoking {@link Caller} instances from a compiled brainmap, or when attempting to box or
