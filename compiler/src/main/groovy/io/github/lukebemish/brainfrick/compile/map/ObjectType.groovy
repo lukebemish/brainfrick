@@ -57,11 +57,7 @@ class ObjectType implements ArgType, ReturnType {
     void writeReturn(MethodVisitor mv, int cells) {
         if (name != new ObjectType(String.class).name) {
             mv.visitVarInsn(Opcodes.ALOAD, cells + 2)
-            mv.visitInsn(Opcodes.DUP)
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.', '/'), "size", "()I", true)
-            mv.visitInsn(Opcodes.ICONST_M1)
-            mv.visitInsn(Opcodes.IADD)
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, List.class.name.replace('.', '/'), "get", "(I)L${BrainMapCompiler.OBJECT_NAME};", true)
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, StringUtils.class.name.replace('.','/'), "fromBuffer", "(L${BrainMapCompiler.LIST_NAME};)L${BrainMapCompiler.OBJECT_NAME};", false)
             this.castTo(mv)
         } else {
             mv.visitVarInsn(Opcodes.ALOAD, cells + 2)

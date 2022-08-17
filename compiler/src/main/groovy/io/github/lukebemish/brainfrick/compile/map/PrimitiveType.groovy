@@ -8,18 +8,20 @@ import org.objectweb.asm.Opcodes
 
 @CompileStatic
 enum PrimitiveType implements ArgType, ReturnType {
-    INT('I'),
-    SHORT('S'),
-    BYTE('B'),
-    CHAR('C'),
-    LONG('J'),
-    FLOAT('F'),
-    DOUBLE('D'),
-    BOOLEAN('Z')
+    INT('I',Integer.class.name.replace('.','/')),
+    SHORT('S',Short.class.name.replace('.','/')),
+    BYTE('B',Byte.class.name.replace('.','/')),
+    CHAR('C',Character.class.name.replace('.','/')),
+    LONG('J',Long.class.name.replace('.','/')),
+    FLOAT('F',Float.class.name.replace('.','/')),
+    DOUBLE('D',Double.class.name.replace('.','/')),
+    BOOLEAN('Z',Boolean.class.name.replace('.','/'))
 
     final String desc
-    PrimitiveType(String desc) {
+    final String boxingDesc
+    PrimitiveType(String desc, String boxingDesc) {
         this.desc = desc
+        this.boxingDesc = boxingDesc
     }
 
     @Override
@@ -31,9 +33,8 @@ enum PrimitiveType implements ArgType, ReturnType {
 
     @Override
     void castAsObject(MethodVisitor mv) {
-        String methodName = "from"+desc
-        String methodDesc = "(${desc})Ljava/lang/Object;"
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, InvocationUtils.class.name.replace('.','/'),methodName, methodDesc, false)
+        String methodDesc = "(${desc})L${boxingDesc};"
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, boxingDesc,"valueOf", methodDesc, false)
     }
 
     @Override

@@ -1,8 +1,5 @@
 /**
- * Contains classes used at runtime by brainfrick; everything within this package should be considered an implementation
- * detail, and should not be initialized or invoked directly.
+ * Contains classes used at runtime by brainfrick. These classes should generally not be referenced in code.
  */
-@ApiStatus.Internal
 package io.github.lukebemish.brainfrick.lang.runtime;
 
-import org.jetbrains.annotations.ApiStatus;

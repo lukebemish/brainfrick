@@ -2,9 +2,7 @@ package io.github.lukebemish.brainfrick.lang.runtime;
 
 import io.github.lukebemish.brainfrick.lang.Decrementable;
 import io.github.lukebemish.brainfrick.lang.Incrementable;
-import io.github.lukebemish.brainfrick.lang.Numberlike;
 import io.github.lukebemish.brainfrick.lang.Zeroable;
-import io.github.lukebemish.brainfrick.lang.exception.ImproperTypeException;
 import io.github.lukebemish.brainfrick.lang.exception.UnsupportedCellOperationException;
 
 import java.util.Arrays;
@@ -12,8 +10,7 @@ import java.util.Arrays;
 /**
  * Holds the structure used to store data during a brainfrick method execution. A method will hold a reference to one of
  * these, as its first non-argument local variable, as well as an integer that points to a location within it as the
- * second such local variable. This structure is considered an implementation detail, and should not be initialized or
- * modified directly as its implementation may change.
+ * second such local variable.
  */
 public final class Cells {
     private static final Object[] EMPTY_DATA = {};
@@ -24,6 +21,10 @@ public final class Cells {
     private int sizeP;
     private int sizeN;
 
+    /**
+     * Creates a new cell structure. Should be called once at the beginning of each method or constructor in compiled
+     * brainfrick. Each location in the structure is initialized as null.
+     */
     public Cells() {
         this.dataP = EMPTY_DATA;
         this.dataN = EMPTY_DATA;
@@ -52,11 +53,21 @@ public final class Cells {
             return new Object[Math.max(DEFAULT_SIZE, minCapacity)];
     }
 
+    /**
+     * Gets the object at a given index in the structure; used during the '.' operation.
+     * @param idx The index of the element to return. Can be a positive or negative value.
+     * @return The object at that index of the structure, or null if no element is stored there.
+     */
     public Object get(int idx) {
         expandToIdx(idx);
         return (idx >= 0) ? dataP[idx] : dataN[1-idx];
     }
 
+    /**
+     * Replaces the object at a given index in the structure.
+     * @param idx The index of the element to replace. Can be a positive or negative value.
+     * @param obj The object to place at that index in the structure, or null to clear that index.
+     */
     public void set(int idx, Object obj) {
         expandToIdx(idx);
         if (idx >= 0)
@@ -73,30 +84,30 @@ public final class Cells {
                 obj instanceof Boolean;
     }
 
-    public static int getIntValue(Object obj) {
-        if (obj instanceof Number number)
-            return number.intValue();
-        else if (obj instanceof Character character)
-            return character;
-        else if (obj instanceof Boolean bool)
-            return Boolean.TRUE.equals(bool)?1:0;
-        else if (obj == null)
-            return 0;
-        else if (obj instanceof Numberlike i)
-            return i.getInt();
-        throw new ImproperTypeException("Object of type "+obj.getClass()+" is not integer-like.",obj.getClass(),int.class);
-    }
-
+    /**
+     * Gets an integer representation of the object at a given index, to be used during the ':' or ',' operations.
+     * @param idx The index to get an integer representation of.
+     * @return An integer representation of the element at the given index.
+     * @exception io.github.lukebemish.brainfrick.lang.exception.ImproperTypeException if the value cannot be unboxed or
+     * converted to an int
+     * @see io.github.lukebemish.brainfrick.lang.Numberlike
+     */
     public int asInt(int idx) {
-        return getIntValue(get(idx));
+        return InvocationUtils.asI(get(idx));
     }
 
+    /**
+     * Determines whether the element at a given index is zero-like. Used during the '[' and ']' operations.
+     * @param idx The index of the object to be checked.
+     * @return true if the object is zero-like, false otherwise.
+     * @see Zeroable
+     */
     public boolean isZero(int idx) {
         Object obj = get(idx);
         if (obj==null)
             return true;
         else if (isStrictlyInteger(obj))
-            return getIntValue(obj)==0;
+            return InvocationUtils.asI(obj)==0;
         else if (obj instanceof Float f)
             return f==0;
         else if (obj instanceof Double d)
@@ -110,11 +121,18 @@ public final class Cells {
         return false;
     }
 
+    /**
+     * Increments the object at the given cell the provided number of times. Used during the '+' operation.
+     * @param idx The index of the object to be incremented.
+     * @param amount The number of times to increment the object.
+     * @exception UnsupportedCellOperationException if the object cannot be incremented.
+     * @see Incrementable
+     */
     public void incr(int idx, int amount) {
         set(idx,incr(get(idx),amount));
     }
 
-    public static Object incr(Object obj, int amount) {
+    private static Object incr(Object obj, int amount) {
         Object toSet;
         if (obj == null)
             toSet = amount;
@@ -143,11 +161,18 @@ public final class Cells {
         return toSet;
     }
 
+    /**
+     * Decrements the object at the given cell the provided number of times. Used during the '-' operation.
+     * @param idx The index of the object to be decremented.
+     * @param amount The number of times to decrement the object.
+     * @exception UnsupportedCellOperationException if the object cannot be decremented.
+     * @see Decrementable
+     */
     public void decr(int idx, int amount) {
         set(idx,decr(get(idx),amount));
     }
 
-    public static Object decr(Object obj, int amount) {
+    private static Object decr(Object obj, int amount) {
         Object toSet;
         if (obj == null)
             toSet = -amount;
@@ -177,8 +202,8 @@ public final class Cells {
     }
 
     // Internal array utils. Similar to ArraysSupport
-    public static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
-    public static int newLength(int oldLength, int minGrowth, int prefGrowth) {
+    private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
+    private static int newLength(int oldLength, int minGrowth, int prefGrowth) {
         int prefLength = oldLength + Math.max(minGrowth, prefGrowth);
         return (0 < prefLength && prefLength <= SOFT_MAX_ARRAY_LENGTH) ?
             prefLength : hugeLength(oldLength, minGrowth);
