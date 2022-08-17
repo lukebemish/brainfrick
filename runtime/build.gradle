@@ -1,5 +1,6 @@
 plugins {
     id 'maven-publish'
+    id 'signing'
 }
 
 version '1.0.0'
@@ -17,10 +18,61 @@ repositories {
     mavenCentral()
 }
 
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
 publishing {
     publications {
         maven(MavenPublication) {
             from components.java
+
+            pom {
+                name = "Brainfrick Runtime"
+                packaging = 'jar'
+                artifactId = 'brainfrick-runtime'
+                description = 'Classes used at runtime by brainfrick, a modified brainfuck able to be compiled for or run on the JVM.'
+                url = 'https://github.com/lukebemish/brainfrick'
+                inceptionYear = '2022'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'lukebemish'
+                        name = 'Luke Bemish'
+                        email = 'lukebemish@gmail.com'
+                        url = 'https://github.com/lukebemish/'
+                    }
+                }
+                scm {
+                    connection='scm:git:git://github.com/lukebemish/brainfrick.git'
+                    developerConnection='scm:git:ssh://github.com/lukebemish/brainfrick.git'
+                    url='https://github.com/lukebemish/brainfrick'
+                }
+            }
         }
+    }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = project.ossrhUsername
+                password = project.ossrhPassword
+            }
+        }
+    }
+}
+
+if(project.hasProperty("signing.gnupg.keyName")) {
+    signing {
+        useGpgCmd()
+        sign publishing.publications.maven
     }
 }
