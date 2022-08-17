@@ -4,6 +4,7 @@ import java.util.List;
 
 /**
  * Represents any sort of callable object. This could be a method, constructor, field getter or setter, or class getter.
+ * The runtime representations of brainmaps are made up of callers.
  */
 public interface Caller {
 
