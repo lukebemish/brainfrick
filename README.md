@@ -25,7 +25,7 @@ dependencies {
 
 Brainfrick code can be written in `.frick` files inside of the `brainfrick` folder within a source set: for instance, `src/main/brainfrick/helloWorld.frick`. Brainmaps are referenced from `.frick` files by relative path, and should have the `.map` extension.
 
-## Notes
+## Syntax
 
 To allow references to JVM classes and methods within a brainfuck-like environment, brainfrick requires the user to define any number of `brainmaps`.
 These are ordered lists of classes, methods, and field getters or setters. They take a form such as shown below:
@@ -92,4 +92,4 @@ The code itself is an extended version of normal brainfuck syntax:
 | `:`     | Using the value at the pointer as an index, invokes the corresponding value from the declared brainmaps using the top of the buffer as arguments, if necessary. The cell is set to:<br><ul><li>The corresponding `Class` object, if the index corresponds to a class.<li>The returned object, if the index is a non-`void` method, constructor, or field getter.<li>`null`, if the index is a `void` method or field putter.</ul> |
 | `;`     | Invokes the super method or constructor for this method using the top of the buffer. Will always be called at least one in constructors; in constructors, the `this` argument will not be consumed, but is necessary in methods.                                                                                                                                                                                                  |
 
-All cells start out with a value of `null`.
+All cells start out with a value of `null`. All characters other than those with specific meanings are ignored; however, it is recommended to use comments for other non-alphanumeric characters, in case the syntax ever has to be expanded further. Single-line and multi-line comments work the same as in java, with `//` and `/* ... */` respectively.
