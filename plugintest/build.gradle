@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'io.github.lukebemish.brainfrick.plugin'
+    id 'application'
+}
+
+application {
+    mainClass = 'brainfrick.test.TestEverything'
+}
+
+dependencies {
+    implementation "io.github.lukebemish.brainfrick:runtime"
+}

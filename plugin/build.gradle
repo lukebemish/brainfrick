@@ -1,0 +1,35 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+group 'io.github.lukebemish.brainfrick'
+version '1.0-SNAPSHOT'
+archivesBaseName = "brainfrick-plugin"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.groovy:groovy:4.0.4'
+    implementation 'org.ow2.asm:asm:9.3'
+    implementation 'org.apache.commons:commons-text:1.9'
+    implementation 'org.antlr:antlr4:4.10.1'
+
+    implementation project(":compiler")
+}
+
+tasks.withType(JavaCompile) {
+    source(project(":compiler").sourceSets.main.allSource)
+    source(project(":runtime").sourceSets.main.allSource)
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'io.github.lukebemish.brainfrick.plugin'
+            implementationClass = 'io.github.lukebemish.brainfrick.plugin.gradle.BrainfrickBasePlugin'
+        }
+    }
+}
+

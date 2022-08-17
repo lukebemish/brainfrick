@@ -17,21 +17,23 @@ import java.nio.file.Path
 class MultipleCompiler {
     static final String BRAINFRICK_EXTENSION = "frick"
 
-    static void compile(Path inputBrainfrick, Path inputBrainmaps, Path outputdir) {
+    static void compile(Path inputBrainfrick, Path outputdir) {
         List<Path> bfPaths = Files.walk(inputBrainfrick).filter({
             !Files.isDirectory(it) && it.getName(it.nameCount-1).toString().toLowerCase(Locale.ROOT).endsWith(BRAINFRICK_EXTENSION)
         }).toList()
-        compile(bfPaths, inputBrainmaps, outputdir)
+        compile(bfPaths, outputdir)
     }
 
-    static void compile(List<Path> inputBrainfrick, Path inputBrainmaps, Path outputDir) {
+    static void compile(List<Path> inputBrainfrick, Path outputDir) {
         for (Path path : inputBrainfrick) {
             BrainfrickParser.ProgramContext ctx = new BrainfrickParser(new UnbufferedTokenStream<>(new BrainfrickLexer(CharStreams.fromPath(path)))).program()
             List<String> maps = ctx.MAP().collect { StringEscapeUtils.unescapeJava(it.text.substring(1,it.text.size()-1))}
             BrainMap brainMap = new BrainMap()
             for (String mapPath : maps) {
-                Path p = inputBrainmaps.resolve(mapPath)
-                brainMap = BrainMap.parse(new BrainMapParser(new UnbufferedTokenStream<>(new BrainMapLexer(CharStreams.fromPath(p)))).program(),brainMap)
+                Path p = path.parent.resolve(mapPath)
+                if (Files.exists(p)) {
+                    brainMap = BrainMap.parse(new BrainMapParser(new UnbufferedTokenStream<>(new BrainMapLexer(CharStreams.fromPath(p)))).program(), brainMap)
+                }
             }
             Compiler compiler = new Compiler()
             compiler.outdir = outputDir

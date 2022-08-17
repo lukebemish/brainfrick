@@ -1,0 +1,8 @@
+pluginManagement {
+    includeBuild '../'
+}
+
+includeBuild("../") {
+}
+
+rootProject.name = 'brainfrick-plugin-test'
