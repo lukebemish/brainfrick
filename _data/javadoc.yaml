@@ -1,2 +1,4 @@
 - title: Runtime
   url: /javadoc/runtime/
+- title: Gradle
+  url: /javadoc/plugin/
