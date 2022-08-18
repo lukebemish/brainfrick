@@ -27,36 +27,7 @@ javadoc {
     title = "Brainfrick Runtime - v${version}"
 }
 
-gitPublish {
-    repoUri = "https://github.com/lukebemish/brainfrick.git"
-
-    branch = 'gh-pages'
-
-    repoDir = file("$buildDir/gitPublish")
-    contents {
-        from(javadoc) {
-            into 'apidoc/runtime'
-            exclude 'stylesheet.css'
-        }
-    }
-    preserve {
-        include '**/*'
-        exclude {FileTreeElement file ->
-            file.relativePath.pathString.startsWith("apidoc/runtime/") &&
-                    !(file.relativePath.pathString.startsWith('apidoc/runtime/stylesheet.css'))
-        }
-    }
-    commitMessage = 'Updating javadocs - runtime'
-}
-
-task pushJavadoc() {
-    doLast {
-        logger.warn "Remember to update pages!"
-    }
-}
-
-publish.dependsOn pushJavadoc
-pushJavadoc.dependsOn gitPublishCommit
+publish.dependsOn rootProject.prepJavadocs
 
 publishing {
     publications {

@@ -52,36 +52,7 @@ javadoc {
     title = "Brainfrick Gradle Plugin - v${version}"
 }
 
-gitPublish {
-    repoUri = "https://github.com/lukebemish/brainfrick.git"
-
-    branch = 'gh-pages'
-
-    repoDir = file("$buildDir/gitPublish")
-    contents {
-        from(javadoc) {
-            into 'apidoc/plugin'
-            exclude 'stylesheet.css'
-        }
-    }
-    preserve {
-        include '**/*'
-        exclude {FileTreeElement file ->
-            file.relativePath.pathString.startsWith("apidoc/plugin/") &&
-                    !(file.relativePath.pathString.startsWith('apidoc/plugin/stylesheet.css'))
-        }
-    }
-    commitMessage = 'Updating javadocs - plugin'
-}
-
-task pushJavadoc() {
-    doLast {
-        logger.warn "Remember to update pages!"
-    }
-}
-
-publish.dependsOn pushJavadoc
-pushJavadoc.dependsOn gitPublishCommit
+publish.dependsOn rootProject.prepJavadocs
 
 
 

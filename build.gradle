@@ -1,5 +1,6 @@
 plugins {
     id "org.ajoberstar.grgit" version "5.0.0"
+    id 'org.ajoberstar.git-publish' version '4.1.1'
 }
 
 subprojects {
@@ -31,3 +32,59 @@ subprojects {
         }
     }
 }
+
+gitPublish {
+    commitMessage = 'Update javadocs'
+    branch = 'gh-pages'
+    repoUri = "https://github.com/lukebemish/brainfrick.git"
+
+    publications {
+        runtime {
+            commitMessage.set('Update javadocs - runtime')
+            branch.set('gh-pages')
+            contents {copyspec->
+                copyspec.from(project(":runtime").javadoc) {
+                    into 'apidoc/runtime'
+                    exclude 'stylesheet.css'
+                }
+            }
+            preserve {copyspec->
+                copyspec.include '**/*'
+                copyspec.exclude {FileTreeElement file ->
+                    file.relativePath.pathString.startsWith("apidoc/runtime/") &&
+                            !(file.relativePath.pathString.startsWith('apidoc/runtime/stylesheet.css'))
+                }
+            }
+        }
+
+        plugin {
+            commitMessage.set('Update javadocs - gradle plugin')
+            branch.set('gh-pages')
+            contents {copyspec->
+                copyspec.from(project(":plugin").javadoc) {
+                    into 'apidoc/plugin'
+                    exclude 'stylesheet.css'
+                }
+            }
+            preserve {copyspec->
+                copyspec.include '**/*'
+                copyspec.exclude {FileTreeElement file ->
+                    file.relativePath.pathString.startsWith("apidoc/plugin/") &&
+                            !(file.relativePath.pathString.startsWith('apidoc/plugin/stylesheet.css'))
+                }
+            }
+        }
+    }
+}
+
+task prepJavadocs() {
+    doLast {
+        logger.warn "Remember to update pages!"
+    }
+}
+
+gitPublishRuntimeCopy.dependsOn project(":runtime").javadoc
+gitPublishPluginCopy.dependsOn project(":plugin").javadoc
+
+prepJavadocs.dependsOn gitPublishRuntimeCommit
+prepJavadocs.dependsOn gitPublishPluginCommit
