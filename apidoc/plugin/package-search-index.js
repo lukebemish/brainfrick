@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"io.github.lukebemish.brainfrick.plugin.gradle"}];updateSearchResults();
