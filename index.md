@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 ## What is brainfrick?
 
 Brainfuck is an esoteric programming language based on only 8 different instructions; two to move a pointer, one each to increment or decrement the value at the pointer, two that allow for control flow, and one each for pulling input and pushing output. Brainfrick is an extension of brainfuck that can be compiled for and run on the JVM; it extends brainfuck's simple syntax with a minimal set of instructions and syntax necessary for interacting with classes.

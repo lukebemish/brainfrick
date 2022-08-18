@@ -6,3 +6,85 @@
 #header_wrap {
   background: none #373737;
 }
+
+.site-nav {
+  position: relative;
+}
+
+.site-nav, .javadoc-nav {
+  background: none #212121;
+  padding: 10px 0px 10px 0px;
+  margin: 0px 0px 0px 0px;
+}
+
+.javadoc-nav {
+  padding: 0px 0px 0px 0px;
+  background: none #373737;
+}
+
+.javadoc-nav .nav-label {
+  float: left;
+  font-weight: 700;
+  color: #fff;
+  font-size: 22px;
+  font-family: 'Lucida Grande', 'Calibri', Helvetica, Arial, sans-serif;
+  letter-spacing: -1px;
+  margin: 0px 0px 0px 0px;
+  padding: 6px 8px 6px 8px;
+}
+
+.site-nav a, .javadoc-nav a {
+  font-weight: 700;
+  color: #fff;
+  font-size: 18px;
+  font-family: 'Lucida Grande', 'Calibri', Helvetica, Arial, sans-serif;
+  letter-spacing: -1px;
+  margin: 0px 0px 0px 0px;
+  padding: 15px 10px 15px 10px;
+}
+
+.javadoc-nav a {
+  padding: 8px 8px 8px 8px;
+  float: right;
+}
+
+.site-nav a:hover, .site-nav a:focus {
+  background: none #373737;
+  text-decoration: none;
+}
+
+.javadoc-nav a:hover, .javadoc-nav a:focus {
+  background: none #459de0;
+  text-decoration: none;
+}
+
+.javadoc-wrapper {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  align-items: stretch;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.javadoc-header {
+  flex: 0 1 auto;
+  margin: 0;
+}
+
+.javadoc-container {
+  flex: 1 1 auto;
+  height: 100%;
+  margin: 0;
+}
+
+.javadoc-container iframe {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+

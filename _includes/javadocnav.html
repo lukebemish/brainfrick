@@ -1,0 +1,12 @@
+{%- assign titles_size = site.data.javadoc | map: 'title' | join: '' | size -%}
+
+{%- if titles_size > 0 -%}
+  <nav class="javadoc-nav">
+    <div>
+      <p class="nav-label">{{page.title}}</p>
+      {%- for path in site.data.javadoc -%}
+        <a href="{{site.baseurl}}{{path.url}}" alt="{{path.title}}">{{path.title}}</a>
+      {%- endfor -%}
+    </div>
+  </nav>
+{%- endif -%}

@@ -1,7 +1,10 @@
-layout: page
+---
+layout: javadoc
 title: "Javadoc - Brainfrick Runtime"
 permalink: /javadoc/runtime/
+---
 
-## Javadocs - Brainfrick Runtime
+<div class="javadoc-container">
+  <iframe class="javadoc-frame" src="{{site.baseurl}}/apidoc/runtime/index"></iframe>
+</div>
 
-{% include_relative apidoc/runtime/index.html %}
