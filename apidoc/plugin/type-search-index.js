@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"io.github.lukebemish.brainfrick.plugin.gradle","l":"BrainfrickBasePlugin"},{"p":"io.github.lukebemish.brainfrick.plugin.gradle","l":"BrainfrickCompile"}];updateSearchResults();
