@@ -27,5 +27,5 @@ jobs:
           repository: ''             # Default is current repository
           branch: 'gh-pages'         # Default is gh-pages for github provider
           jekyll_src: './'           # Default is root directory
-          jekyll_baseurl: '/site/'
+          jekyll_baseurl: '/site'
           pre_build_commands: ''     # Installing additional dependencies (Arch Linux)
