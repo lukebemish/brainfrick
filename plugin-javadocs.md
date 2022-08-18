@@ -5,6 +5,6 @@ permalink: /javadoc/plugin/
 ---
 
 <div class="javadoc-container">
-  <iframe class="javadoc-frame" src="{{site.baseurl}}/plugin/runtime/index"></iframe>
+  <iframe class="javadoc-frame" src="{{site.baseurl}}/apidoc/plugin/"></iframe>
 </div>
 
