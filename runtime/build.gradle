@@ -1,5 +1,6 @@
 plugins {
     id 'maven-publish'
+    id 'org.ajoberstar.git-publish' version '4.1.1'
     id 'signing'
 }
 
@@ -21,6 +22,37 @@ repositories {
 artifacts {
     archives javadocJar, sourcesJar
 }
+
+gitPublish {
+    repoUri = "https://github.com/lukebemish/brainfrick.git"
+
+    branch = 'gh-pages'
+
+    repoDir = file("$rootProject.buildDir/gitPublish")
+    contents {
+        from(javadoc) {
+            into 'apidoc/runtime'
+            exclude 'stylesheet.css'
+        }
+    }
+    preserve {
+        include '**/*'
+        exclude {FileTreeElement file ->
+            file.relativePath.pathString.startsWith("apidoc/runtime/") &&
+                    !(file.relativePath.pathString.startsWith('apidoc/runtime/stylesheet.css'))
+        }
+    }
+    commitMessage = 'Updating javadocs'
+}
+
+task pushJavadoc() {
+    doLast {
+        logger.warn "Remember to update pages!"
+    }
+}
+
+publish.dependsOn pushJavadoc
+pushJavadoc.dependsOn gitPublishCommit
 
 publishing {
     publications {
