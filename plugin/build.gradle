@@ -1,6 +1,7 @@
 plugins {
     id 'java-gradle-plugin'
     id 'maven-publish'
+    id 'org.ajoberstar.git-publish' version '4.1.1'
     id 'com.gradle.plugin-publish' version '1.0.0'
 }
 
@@ -25,6 +26,11 @@ tasks.withType(JavaCompile) {
     source(project(":runtime").sourceSets.main.allSource)
 }
 
+sourcesJar {
+    from(project(":compiler").sourceSets.main.allSource)
+    from(project(":runtime").sourceSets.main.allSource)
+}
+
 pluginBundle {
     website = 'https://github.com/lukebemish/brainfrick'
     vcsUrl = 'https://github.com/lukebemish/brainfrick'
@@ -41,6 +47,41 @@ gradlePlugin {
         }
     }
 }
+
+javadoc {
+    title = "Brainfrick Gradle Plugin - v${version}"
+}
+
+gitPublish {
+    repoUri = "https://github.com/lukebemish/brainfrick.git"
+
+    branch = 'gh-pages'
+
+    repoDir = file("$buildDir/gitPublish")
+    contents {
+        from(javadoc) {
+            into 'apidoc/plugin'
+            exclude 'stylesheet.css'
+        }
+    }
+    preserve {
+        include '**/*'
+        exclude {FileTreeElement file ->
+            file.relativePath.pathString.startsWith("apidoc/plugin/") &&
+                    !(file.relativePath.pathString.startsWith('apidoc/plugin/stylesheet.css'))
+        }
+    }
+    commitMessage = 'Updating javadocs - plugin'
+}
+
+task pushJavadoc() {
+    doLast {
+        logger.warn "Remember to update pages!"
+    }
+}
+
+publish.dependsOn pushJavadoc
+pushJavadoc.dependsOn gitPublishCommit
 
 
 

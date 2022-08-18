@@ -23,12 +23,16 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
+javadoc {
+    title = "Brainfrick Runtime - v${version}"
+}
+
 gitPublish {
     repoUri = "https://github.com/lukebemish/brainfrick.git"
 
     branch = 'gh-pages'
 
-    repoDir = file("$rootProject.buildDir/gitPublish")
+    repoDir = file("$buildDir/gitPublish")
     contents {
         from(javadoc) {
             into 'apidoc/runtime'
@@ -42,7 +46,7 @@ gitPublish {
                     !(file.relativePath.pathString.startsWith('apidoc/runtime/stylesheet.css'))
         }
     }
-    commitMessage = 'Updating javadocs'
+    commitMessage = 'Updating javadocs - runtime'
 }
 
 task pushJavadoc() {

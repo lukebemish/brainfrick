@@ -16,6 +16,9 @@ import org.gradle.internal.Cast;
 
 import javax.inject.Inject;
 
+/**
+ * Extends {@link JavaBasePlugin} to provide support for compiling brainfrick source files.
+ */
 public class BrainfrickBasePlugin implements Plugin<Project> {
     private final ObjectFactory objectFactory;
     private Project project;
