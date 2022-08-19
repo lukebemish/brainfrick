@@ -1,6 +1,5 @@
-markdown: kramdown
 repository: lukebemish/brainfrick
 
 theme: jekyll-theme-slate
-plugins:
-  - jekyll-spaceship
+
+highlighter: rouge
