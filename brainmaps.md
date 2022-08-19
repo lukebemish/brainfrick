@@ -158,11 +158,11 @@ public class fully.qualified.Name extends fully.qualified.SuperName
     public void someMethod(@javax.annotation.Nonnull java.lang.String)
 class java.lang.Object
 ```
-All manner of objects can be annotated in a brainmap. These annotations should use
-`@` for annotations which ought to be runtime-visible, and `@?` for annotations
-which should be in the class file but invisible at runtime. Annotations may
-optionally take a comma-separated list of name-value pairs, of the following
-forms:
+All brainmap entries, as well as method or constructor parameters, can be annotated.
+These annotations should use `@` for annotations which ought to be runtime-visible,
+and `@?` for annotations which should be in the class file but invisible at runtime.
+Annotations may optionally take a comma-separated list of name-value pairs, with
+values of the following forms:
 
 | Type        | Example                                                           |
 | :------     | :---------------------------------------------------------------- |
