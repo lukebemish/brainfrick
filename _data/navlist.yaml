@@ -1,4 +1,6 @@
 - title: About
   url: /
+- title: Brainmaps
+  url: /spec/brainmap
 - title: Javadoc
   url: /javadoc/runtime

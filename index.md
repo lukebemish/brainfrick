@@ -6,6 +6,26 @@ layout: default
 
 Brainfuck is an esoteric programming language based on only 8 different instructions; two to move a pointer, one each to increment or decrement the value at the pointer, two that allow for control flow, and one each for pulling input and pushing output. Brainfrick is an extension of brainfuck that can be compiled for and run on the JVM; it extends brainfuck's simple syntax with a minimal set of instructions and syntax necessary for interacting with classes.
 
+## Using
+
+Brainfrick provides a gradle plugin for compiling brainfrick code, and the runtime libraries are available on maven central. To use, apply the plugin and add the runtime libraries as a dependency:
+
+```gradle
+plugins {
+    id 'io.github.lukebemish.brainfrick' version '<plugin-version>'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.lukebemish.brainfrick:brainfrick-runtime:<version>'
+}
+```
+
+Brainfrick code can be written in `.frick` files inside of the `brainfrick` folder within a source set: for instance, `src/main/brainfrick/helloWorld.frick`. Brainmaps are referenced from `.frick` files by relative path, and should have the `.map` extension.
+
 ## Syntax
 
 To allow references to JVM classes and methods within a brainfuck-like environment, brainfrick requires the user to define any number of `brainmaps`.
@@ -59,7 +79,7 @@ map was saved as `brainmap.map`, a corresponding brainfrick source file might be
 
 The code itself is an extended version of normal brainfuck syntax:
 
-| Command | Description                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Command | Description                                                                                 |
 | :-------| :------------------------------------------------------------------------------------------ |
 | `>`     | Moves the pointer one to the right. Pointer locations can be any integer value. |
 | `<`     | Moves the pointer one to the left |
