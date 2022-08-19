@@ -164,16 +164,17 @@ which should be in the class file but invisible at runtime. Annotations may
 optionally take a comma-separated list of name-value pairs, of the following
 forms:
 
-| Type        | Example                                                        |
-| :------     | :------------------------------------------------------------- |
-| int         | `1` or `1i`                                                    |
-| short       | `3s`                                                           |
-| byte        | `4b`                                                           |
-| char        | `'a'`                                                          |
-| long        | `-2l`                                                          |
-| float       | `3.5f`                                                         |
-| double      | `2.0` or `2.0d`                                                |
-| String      | `"Hello, world!"`                                              |
-| Class       | `java.lang.Object`                                             |
-| Enum Value  | `fully.qualified.EnumName#ENUM_VALUE`                          |
+| Type        | Example                                                           |
+| :------     | :---------------------------------------------------------------- |
+| int         | `1` or `1i`                                                       |
+| short       | `3s`                                                              |
+| byte        | `4b`                                                              |
+| char        | `'a'`                                                             |
+| long        | `-2l`                                                             |
+| float       | `3.5f`                                                            |
+| double      | `2.0` or `2.0d`                                                   |
+| String      | `"Hello, world!"`                                                 |
+| Class       | `java.lang.Object`                                                |
+| Enum Value  | `fully.qualified.EnumName#ENUM_VALUE`                             |
+| Annotation  | `@fully.qualified.AnnotationName...` (same as the outer notation) |
 
