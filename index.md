@@ -52,8 +52,10 @@ abstract public class brainfrick.test.TestField
   abstract java.lang.Object someMethod()
 ```
 
-More details on brainmap syntax can be found at the [brainmap specification](brainmaps.md). Brainmaps are referenced at the beginning of a brainfrick source file, and are integrated into classes at compile time. For instance, if the previous
-map was saved as `brainmap.map`, a corresponding brainfrick source file might be:
+More details on brainmap syntax can be found at the [brainmap specification](brainmaps.md).
+Brainmaps are referenced at the beginning of a brainfrick source file, and are integrated
+into classes at compile time. For instance, if the previous map was saved as `brainmap.map`,
+a corresponding brainfrick source file might be:
 ```brainfrick
 // Brainmaps to use are declared before anything else. Any number can be declared; they will
 // be appended together at compile time.
