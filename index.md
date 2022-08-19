@@ -8,6 +8,9 @@ Brainfuck is an esoteric programming language based on only 8 different instruct
 
 ## Using
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.lukebemish.brainfrick/brainfrick-runtime?style=for-the-badge)](https://search.maven.org/artifact/io.github.lukebemish.brainfrick/brainfrick-runtime)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/io.github.lukebemish.brainfrick?style=for-the-badge)](https://plugins.gradle.org/plugin/io.github.lukebemish.brainfrick)
+
 Brainfrick provides a gradle plugin for compiling brainfrick code, and the runtime libraries are available on maven central. To use, apply the plugin and add the runtime libraries as a dependency:
 
 ```gradle
