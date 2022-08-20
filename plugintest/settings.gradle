@@ -3,9 +3,6 @@ pluginManagement {
 }
 
 includeBuild("../") {
-    dependencySubstitution {
-        substitute module('io.github.lukebemish.brainfrick:compiler') using project(':compiler')
-    }
 }
 
 rootProject.name = 'brainfrick-plugin-test'

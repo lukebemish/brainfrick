@@ -1,9 +1,3 @@
-buildscript {
-    dependencies {
-        classpath "io.github.lukebemish.brainfrick:compiler"
-    }
-}
-
 plugins {
     id 'java'
     id 'io.github.lukebemish.brainfrick'

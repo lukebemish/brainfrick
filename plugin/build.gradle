@@ -1,15 +1,22 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java-gradle-plugin'
+    id 'groovy'
     id 'maven-publish'
     id 'org.ajoberstar.git-publish' version '4.1.1'
     id 'com.gradle.plugin-publish' version '1.0.0'
 }
 
-version '1.0.1'
+version '1.0.2'
 archivesBaseName = "brainfrick-plugin"
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    shade
+    compileOnly.extendsFrom shade
 }
 
 dependencies {
@@ -17,13 +24,18 @@ dependencies {
     implementation 'org.ow2.asm:asm:9.3'
     implementation 'org.apache.commons:commons-text:1.9'
     implementation 'org.antlr:antlr4:4.10.1'
+    compileOnly 'org.jetbrains:annotations:23.0.0'
 
-    compileOnly project(":compiler")
+    shade project(':compiler')
 }
 
-tasks.withType(JavaCompile) {
-    source(project(":compiler").sourceSets.main.allSource)
-    source(project(":runtime").sourceSets.main.allSource)
+tasks.shadowJar {
+    classifier = ''
+    configurations = [project.configurations.shade]
+    dependencies {
+        include(project(":compiler"))
+        include(project(":runtime"))
+    }
 }
 
 sourcesJar {
@@ -36,6 +48,8 @@ pluginBundle {
     vcsUrl = 'https://github.com/lukebemish/brainfrick'
     tags = ['brainfrick']
 }
+
+jar.finalizedBy(shadowJar)
 
 gradlePlugin {
     plugins {
