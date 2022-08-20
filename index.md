@@ -66,6 +66,10 @@ a corresponding brainfrick source file might be:
     ;{
         ;
     }
+    {
+        // Static blocks can be defined like so. Returning early from one static block returns early from
+        // all future ones as well.
+    }
 }
 // A "-" tells the compiler to skip this class or method - in this case, we don't want to redefine Object!
 -
