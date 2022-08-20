@@ -47,40 +47,40 @@ class Compiler {
         mapCompiler.writeBrainMap(map)
 
         //Fields
-        List<BrainMap.BrainField> staticFields = new ArrayList<>()
+        ArrayList<BrainMap.BrainField> combined = new ArrayList<>()
         Set<String> knownStatic = new HashSet<>()
-        List<BrainMap.BrainField> instanceFields = new ArrayList<>()
         Set<String> knownInstance = new HashSet<>()
         type.children.findAll {it instanceof BrainMap.BrainPutter}.each {
+            BrainMap.BrainPutter itp = (BrainMap.BrainPutter) it
             if (it.isStatic()) {
-                staticFields.add((BrainMap.BrainField) it)
-                knownStatic.add(((BrainMap.BrainField)it).name)
+                combined.add(itp)
+                knownStatic.add(itp.name)
             } else {
-                instanceFields.add((BrainMap.BrainField) it)
-                knownInstance.add(((BrainMap.BrainField)it).name)
+                combined.add(itp)
+                knownInstance.add(itp.name)
             }
         }
         type.children.findAll {it instanceof BrainMap.BrainGetter}.each {
             BrainMap.BrainGetter itg = (BrainMap.BrainGetter) it
-            if (it.isStatic() && !knownStatic.contains(itg.name)) {
-                staticFields.add((BrainMap.BrainField) it)
-                knownStatic.add(((BrainMap.BrainField)it).name)
-            } else if (!knownInstance.contains(itg.name)) {
-                instanceFields.add((BrainMap.BrainField) it)
-                knownInstance.add(((BrainMap.BrainField)it).name)
+            String name = itg.name
+            if (it.isStatic() && !(name in knownStatic)) {
+                combined.add(itg)
+                knownStatic.add(itg.name)
+            } else if (!it.isStatic() && !(name in knownInstance)) {
+                combined.add(itg)
+                knownInstance.add(itg.name)
             }
         }
-        ArrayList<BrainMap.BrainField> combined = new ArrayList<>()
-        combined.addAll(instanceFields)
-        combined.addAll(staticFields)
         combined.each {
             var fv = cw.visitField(it.accessModifier, it.name, it.type.desc, null, null)
-            ((BrainMap.BrainField)combined).findCombined().each {
-                var av = fv.visitAnnotation(it.type().desc, it.runtime())
-                it.values().each {key, value ->
-                    value.visitParameter(av,key)
+            combined.each {
+                it.findCombined().each {
+                    var av = fv.visitAnnotation(it.type().desc, it.runtime())
+                    it.values().each { key, value ->
+                        value.visitParameter(av, key)
+                    }
+                    av.visitEnd()
                 }
-                av.visitEnd()
             }
             fv.visitEnd()
         }
