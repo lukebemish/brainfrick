@@ -41,7 +41,7 @@ gitPublish {
     publications {
         runtime {
             commitMessage.set('Update javadocs - runtime')
-            branch.set('gh-pages')
+            branch.set('gh-pages-staging')
             contents {copyspec->
                 copyspec.from(project(":runtime").javadoc) {
                     into 'apidoc/runtime'
@@ -59,7 +59,7 @@ gitPublish {
 
         plugin {
             commitMessage.set('Update javadocs - gradle plugin')
-            branch.set('gh-pages')
+            branch.set('gh-pages-staging')
             contents {copyspec->
                 copyspec.from(project(":plugin").javadoc) {
                     into 'apidoc/plugin'
