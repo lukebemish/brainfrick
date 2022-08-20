@@ -103,9 +103,12 @@ public class fully.qualified.Name
     get static final java.util.List LIST
     put int i
 ```
-Field getters and setters can be given the `public`, `protected`, `private`, `final`,
-or `static` modifiers. They are package-private unless otherwise specified. Fields
-you are not defining but only using do not need access modifiers specified.
+Field getters and setters can be given the `public`, `protected`, `private`,
+or `static` modifiers. They are package-private unless otherwise specified.
+Currently, fields being declared cannot be final, as there is no way to
+ensure that the fields are properly initialized. Accessing final fields, however,
+should work fine.
+Fields you are not defining but only using do not need access modifiers specified.
 Fields will be defined if either a getter or setter (or both) is present in the
 last class listed in the brainmap prior to the field declaration, and if that
 class is being defined. Their return type can be a fully qualified class name or
