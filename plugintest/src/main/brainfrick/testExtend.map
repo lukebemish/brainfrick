@@ -1,4 +1,9 @@
 public class brainfrick.test.TestExtend implements java.util.function.Function
     public java.lang.Object apply(java.lang.Object)
     public new() -> java.lang.Object new()
+public class brainfrick.test.TestExtend2 implements java.util.function.Function
+    public put int someInt
+    public get int someInt
+    public java.lang.Object apply(java.lang.Object)
+    public new(int) -> java.lang.Object new()
 class java.lang.Object

@@ -133,8 +133,10 @@ class BrainMapCompiler {
             parent.type.castTo(mv)
 
             mv.visitFieldInsn(Opcodes.GETFIELD, parent.type.names.join('/'), getter.name, getter.type.desc)
+            getter.type.castAsObject(mv)
         } else {
             mv.visitFieldInsn(Opcodes.GETSTATIC, parent.type.names.join('/'), getter.name, getter.type.desc)
+            getter.type.castAsObject(mv)
         }
 
         mv.visitInsn(Opcodes.ARETURN)
@@ -151,7 +153,7 @@ class BrainMapCompiler {
             mv.visitInsn(Opcodes.DUP)
             constantInt(mv, 2)
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, BUFFER_UTILS_NAME, CHECK_ENOUGH, CHECK_ENOUGH_DESC, false)
-            mv.visitInsn(Opcodes.ICONST_M1)
+            constantInt(mv, -2)
             mv.visitInsn(Opcodes.IADD)
             mv.visitVarInsn(Opcodes.ISTORE,1)
 
@@ -165,7 +167,7 @@ class BrainMapCompiler {
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, LIST_NAME, "remove", "(I)L${OBJECT_NAME};", true)
             putter.type.castTo(mv)
 
-            mv.visitFieldInsn(Opcodes.PUTFIELD, parent.type.names.join('/'), putter.name, putter.type.desc)
+            mv.visitFieldInsn(Opcodes.PUTFIELD, parent.type.name, putter.name, putter.type.desc)
         } else {
             mv.visitVarInsn(Opcodes.ALOAD,0)
 

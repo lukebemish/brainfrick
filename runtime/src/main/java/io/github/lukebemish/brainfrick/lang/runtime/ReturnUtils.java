@@ -3,10 +3,10 @@ package io.github.lukebemish.brainfrick.lang.runtime;
 import java.util.List;
 
 /**
- * Contains utility methods used by brainfrick to handle strings.
+ * Contains utility methods used by brainfrick to handle casting to return types.
  */
-public final class StringUtils {
-    private StringUtils() {}
+public class ReturnUtils {
+    private ReturnUtils() {}
 
     /**
      * Creates a string from a buffer. If the buffer contains a string at the top, that string should be returned.
@@ -43,7 +43,7 @@ public final class StringUtils {
      * not have special cases.
      * @param list The buffer to assemble a string from.
      * @return An object to be returned, after type conversion, by the brainfrick method.
-     * @see StringUtils#fromChars(List)
+     * @see ReturnUtils#fromChars(List)
      * @exception BufferTooSmallException if the buffer does not contain at least one item.
      */
     @SuppressWarnings("rawtypes")
