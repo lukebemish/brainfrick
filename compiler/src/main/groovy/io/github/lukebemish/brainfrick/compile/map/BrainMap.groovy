@@ -45,10 +45,10 @@ class BrainMap {
             var type = new BrainType()
             type.isinterface = true
             ctx.interface_().target().each {
-                if (it instanceof BrainMapParser.MethodContext) {
-                    type.children.add(parseBrainMethod(it))
-                } else if (it instanceof BrainMapParser.FieldContext) {
-                    type.children.add(parseBrainField(it))
+                if (it instanceof BrainMapParser.MethodTargetContext) {
+                    type.children.add(parseBrainMethod(it.method()))
+                } else if (it instanceof BrainMapParser.FieldTargetContext) {
+                    type.children.add(parseBrainField(it.field()))
                 } else {
                     //TODO: throw error
                 }
