@@ -3,7 +3,7 @@
 A modified brainfuck implementation that can compile to JVM bytecode, and allow for object-oriented programming.
 
 ## Using
-[![Docs](https://shields.io/badge/-docs-informational?style=for-the-badge)](https://lukebemish.github.io/brainfrick/)
+[![Docs](https://shields.io/badge/-docs-informational?style=for-the-badge)](https://brainfrick.lukebemish.dev/)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.lukebemish.brainfrick/brainfrick-runtime?style=for-the-badge)](https://search.maven.org/artifact/io.github.lukebemish.brainfrick/brainfrick-runtime)
 [![javadoc](https://javadoc.io/badge2/io.github.lukebemish.brainfrick/brainfrick-runtime/javadoc.svg?style=for-the-badge&prefix=v)](https://javadoc.io/doc/io.github.lukebemish.brainfrick/brainfrick-runtime)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/io.github.lukebemish.brainfrick?style=for-the-badge)](https://plugins.gradle.org/plugin/io.github.lukebemish.brainfrick)
