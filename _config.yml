@@ -3,3 +3,6 @@ repository: lukebemish/brainfrick
 theme: jekyll-theme-slate
 
 highlighter: rouge
+
+plugins:
+  - jekyll-sitemap
