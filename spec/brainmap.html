@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,maximum-scale=2">
+    <link rel="stylesheet" type="text/css" media="screen" href="/brainfrick/assets/css/style.css?v=e0a66726c7b4786c4b4a0fe44a7d7a8e3cc943c0">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Brainmap Specification | brainfrick</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="Brainmap Specification" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A slightly-modified brainfuck that compiles to JVM bytecode" />
+<meta property="og:description" content="A slightly-modified brainfuck that compiles to JVM bytecode" />
+<link rel="canonical" href="http://lukebemish.dev/brainfrick/spec/brainmap" />
+<meta property="og:url" content="http://lukebemish.dev/brainfrick/spec/brainmap" />
+<meta property="og:site_name" content="brainfrick" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Brainmap Specification" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"A slightly-modified brainfuck that compiles to JVM bytecode","headline":"Brainmap Specification","url":"http://lukebemish.dev/brainfrick/spec/brainmap"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/brainfrick/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+    <nav class="site-nav">
+    <div><a href="/brainfrick/" alt="About">About</a><a href="/brainfrick/spec/brainmap" alt="Brainmaps">Brainmaps</a><a href="/brainfrick/javadoc/runtime" alt="Javadoc">Javadoc</a></div>
+  </nav>
+    
+        <header class="inner">
+          
+            <a id="forkme_banner" href="https://github.com/lukebemish/brainfrick">View on GitHub</a>
+          
+
+          <h1 id="project_title">brainfrick</h1>
+          <h2 id="project_tagline">A slightly-modified brainfuck that compiles to JVM bytecode</h2>
+
+          
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2 id="brainmap-specification">Brainmap Specification</h2>
+
+<p>Brainmaps are the means by which brainfrick code can access methods, classes,
+fields, constructors, and other such object oriented aspects of the JVM. The
+brainmap contains a series of entries (generally one per line, though the parser
+ignores all whitespace), indexed from 0 onwards. By using the <code class="language-plaintext highlighter-rouge">:</code> operator in a
+number with an integer-like value, the corresponding member of the brainmaps the
+code is compiled against is called, with the top values of the buffer. For
+instance, if the buffer consisted of <code class="language-plaintext highlighter-rouge">1, 2, 4, 7, 3</code>, with <code class="language-plaintext highlighter-rouge">3</code> being the most
+recently added value, and the <code class="language-plaintext highlighter-rouge">:</code> operator was called invoking a brainmap member
+that expects two inputs, it would be given the inputs <code class="language-plaintext highlighter-rouge">7</code> and <code class="language-plaintext highlighter-rouge">3</code>, in that order.</p>
+
+<p>Brainmaps define both what the code can call and what classes, methods, and fields
+it can define using the <code class="language-plaintext highlighter-rouge">;</code> and <code class="language-plaintext highlighter-rouge">;{ ... }</code> syntax. Each top-level
+<code class="language-plaintext highlighter-rouge">;{</code> in a <code class="language-plaintext highlighter-rouge">.frick</code> file corresponds with a class from the brainmap or brainmaps
+provided to the compiler; each inner <code class="language-plaintext highlighter-rouge">;</code> or <code class="language-plaintext highlighter-rouge">;{</code> corresponds to a method or constructor
+in the class. If you wish to make a method abstract, it must be given the
+<code class="language-plaintext highlighter-rouge">abstract</code> keyword in the brainmap and must not have a body defined in code; this
+can be done by using a <code class="language-plaintext highlighter-rouge">;</code> without brackets. To skip the definition of a method
+or class, use a <code class="language-plaintext highlighter-rouge">-</code>. Fields are defined by default if their class is defined, and
+cannot be skipped.</p>
+
+<h2 id="entries">Entries</h2>
+
+<p>The entries of a brainmap can take the following forms:</p>
+
+<h3 id="class">Class</h3>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="na">fully.qualified.Name</span>
+</code></pre></div></div>
+<p>Classes can be given the <code class="language-plaintext highlighter-rouge">public</code>, <code class="language-plaintext highlighter-rouge">abstract</code>, or <code class="language-plaintext highlighter-rouge">final</code> modifiers. They are
+considered to be package-private unless otherwise specified. Classes you are not
+defining but only calling or accessing do not need access modifiers specified.</p>
+
+<p>Invoking a class from the brainmap places the corresponding <code class="language-plaintext highlighter-rouge">Class</code> object at the
+pointer.</p>
+
+<p>Classes can be made to extend or implement other classes or interfaces much as in
+java, using the <code class="language-plaintext highlighter-rouge">extends</code> and <code class="language-plaintext highlighter-rouge">implements</code> keywords with the fully qualified names
+of the super classes or interfaces:</p>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="na">fully.qualified.Name</span> <span class="kd">implements</span> <span class="na">java.util.function.Function</span><span class="o">,</span> <span class="na">java.util.function.Consumer</span>
+        <span class="kd">extends</span> <span class="na">java.util.AbstractList</span>
+</code></pre></div></div>
+<p>Classes extend <code class="language-plaintext highlighter-rouge">java.lang.Object</code> unless otherwise specified.</p>
+
+<h3 id="interface">Interface</h3>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="na">fully.qualified.Name</span>
+</code></pre></div></div>
+<p>Interfaces can be given the <code class="language-plaintext highlighter-rouge">public</code> modifier. They are
+considered to be package-private unless otherwise specified. Interfaces you are not
+defining but only calling or accessing do not need access modifiers specified.</p>
+
+<p>Invoking an interface from the brainmap places the corresponding <code class="language-plaintext highlighter-rouge">Class</code> object at the
+pointer.</p>
+
+<p>Similar to classes, interfaces can be made to extend other interfaces using the
+<code class="language-plaintext highlighter-rouge">extends</code> keyword:</p>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="na">fully.qualified.Name</span> <span class="kd">extends</span> <span class="na">java.util.List</span>
+</code></pre></div></div>
+
+<h3 id="method">Method</h3>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="na">fully.qualified.Name</span> <span class="kd">extends</span> <span class="na">fully.qualified.NameSuper</span>
+    <span class="kd">protected</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">methodName</span><span class="o">(</span><span class="na">java.lang.String</span><span class="o">,</span> <span class="kt">int</span><span class="o">,</span> <span class="kt">char</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">callMethod</span><span class="o">()</span> <span class="o">-&gt;</span> <span class="na">fully.qualified.NameSuper</span> <span class="nf">callMethod</span><span class="o">()</span>
+<span class="kd">class</span> <span class="na">fully.qualified.NameSuper</span>
+</code></pre></div></div>
+
+<p>Methods can be given the <code class="language-plaintext highlighter-rouge">public</code>, <code class="language-plaintext highlighter-rouge">protected</code>, <code class="language-plaintext highlighter-rouge">private</code>, <code class="language-plaintext highlighter-rouge">final</code>, <code class="language-plaintext highlighter-rouge">static</code>, or
+<code class="language-plaintext highlighter-rouge">abstract</code> modifiers. They are package-private unless otherwise specified. Methods
+you are not defining but only calling do not need access modifiers specified.
+Methods will be defined in the last class listed in the brainmap prior to the
+method declaration. They are defined with comma-separated arguments taking the
+form of either a fully qualified class name or one of <code class="language-plaintext highlighter-rouge">int</code>, <code class="language-plaintext highlighter-rouge">short</code>, <code class="language-plaintext highlighter-rouge">byte</code>,
+<code class="language-plaintext highlighter-rouge">char</code>, <code class="language-plaintext highlighter-rouge">long</code>, <code class="language-plaintext highlighter-rouge">float</code>, <code class="language-plaintext highlighter-rouge">double</code>, or <code class="language-plaintext highlighter-rouge">boolean</code>. The return type can be anything
+the argument typs can be, with the addition of <code class="language-plaintext highlighter-rouge">void</code>.</p>
+
+<p>Invoking a method from the brainmap consumes the same number of values as
+the method has arguments, plus one if the method is non-static. These arguments
+are consumed in order, with the instance for non-static methods being first. The
+return value is placed at the pointer; if the method returns <code class="language-plaintext highlighter-rouge">void</code>, then <code class="language-plaintext highlighter-rouge">null</code>
+is placed at the pointer.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">-&gt;</code> syntax can be used to define a super method of the method; this does not
+change what method the declared method overrides (as that is determined by the signature),
+but it does allow the use of the <code class="language-plaintext highlighter-rouge">;</code> operator to call the super method using values
+from the buffer. The instance that the method is being called on must be included
+on the buffer in such a super call. The class the super method is taken from
+<em>must</em> be present elsewhere in the brainmap.</p>
+
+<h3 id="field-getters-and-setters">Field Getters and Setters</h3>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="na">fully.qualified.Name</span>
+    <span class="kd">get</span> <span class="kd">static</span> <span class="kd">final</span> <span class="na">java.util.List</span> <span class="no">LIST</span>
+    <span class="kd">put</span> <span class="kt">int</span> <span class="no">i</span>
+</code></pre></div></div>
+<p>Field getters and setters can be given the <code class="language-plaintext highlighter-rouge">public</code>, <code class="language-plaintext highlighter-rouge">protected</code>, <code class="language-plaintext highlighter-rouge">private</code>,
+or <code class="language-plaintext highlighter-rouge">static</code> modifiers. They are package-private unless otherwise specified.
+Currently, fields being declared cannot be final, as there is no way to
+ensure that the fields are properly initialized. Accessing final fields, however,
+should work fine.
+Fields you are not defining but only using do not need access modifiers specified.
+Fields will be defined if either a getter or setter (or both) is present in the
+last class listed in the brainmap prior to the field declaration, and if that
+class is being defined. Their return type can be a fully qualified class name or
+a primitive type, the same as method arguments.</p>
+
+<p>Invoking a static field getter places the value of the static field at the pointer.</p>
+
+<p>Invoking a non-static field getter consumes an instance and places the value of
+the field at the pointer.</p>
+
+<p>Invoking a static field setter consumes a value and sets the field to that value,
+placing <code class="language-plaintext highlighter-rouge">null</code> at the pointer.</p>
+
+<p>Invoking a non-static field setter consumes an instance and a value and sets the
+field on that instance to the provided value, placing <code class="language-plaintext highlighter-rouge">null</code> at the pointer.</p>
+
+<h3 id="constructors">Constructors</h3>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="na">fully.qualified.Name</span>
+    <span class="kd">protected</span> <span class="k">new</span><span class="o">(</span><span class="kt">float</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="na">java.lang.Object</span> <span class="k">new</span><span class="o">()</span>
+<span class="kd">class</span> <span class="na">java.lang.Object</span>
+</code></pre></div></div>
+<p>Constructors can be given the <code class="language-plaintext highlighter-rouge">public</code>, <code class="language-plaintext highlighter-rouge">protected</code>, or <code class="language-plaintext highlighter-rouge">private</code> modifiers.
+They are package-private unless otherwise specified. Constructors you are not
+defining but only calling do not need access modifiers specified. Constructors
+will be defined in the last class listed in the brainmap prior to the constructor
+declaration. They are defined with comma-separated arguments taking the same
+possible types as method arguments.</p>
+
+<p>Invoking a constructor from the brainmap consumes the same number of values as
+the constructor has arguments. These arguments are consumed in order, and the
+constructed object is placed at the pointer.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">-&gt;</code> syntax can be used to define a super constructor of the constructor;
+this allows the use of the <code class="language-plaintext highlighter-rouge">;</code> operator to call the super constructor using values
+from the buffer. The instance that the method is being called on <em>cannot</em> be included
+on the buffer in such a super call. Unlike for methods, this syntax is not optional;
+every constructor must call some super constructor. The class the super constructor
+is taken from <em>must</em> be present elsewhere in the brainmap.</p>
+
+<h3 id="annotations">Annotations</h3>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@?fully.qualified.AnnotationName</span><span class="o">(</span><span class="no">string</span><span class="o">=</span><span class="s">"String"</span><span class="o">,</span> <span class="no">enumVal</span><span class="o">=</span><span class="na">fully.qualified.EnumName</span><span class="o">#</span><span class="no">VALUE</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="na">fully.qualified.Name</span> <span class="kd">extends</span> <span class="na">fully.qualified.SuperName</span>
+    <span class="nd">@java.lang.Deprecated</span><span class="o">(</span><span class="no">since</span><span class="o">=</span><span class="s">"1.0"</span><span class="o">,</span> <span class="no">forRemoval</span><span class="o">=</span><span class="kc">true</span><span class="o">)</span>
+    <span class="kd">protected</span> <span class="k">new</span><span class="o">(</span><span class="kt">float</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="na">java.lang.Object</span> <span class="k">new</span><span class="o">()</span>
+    <span class="nd">@?org.jetbrains.annotations.ApiStatus$Experimental</span>
+    <span class="kd">get</span> <span class="kt">int</span> <span class="kt">int</span><span class="no">Field</span>
+    <span class="nd">@javax.annotation.Nullable</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">someMethod</span><span class="o">(</span><span class="nd">@javax.annotation.Nonnull</span> <span class="na">java.lang.String</span><span class="o">)</span>
+<span class="kd">class</span> <span class="na">java.lang.Object</span>
+</code></pre></div></div>
+<p>All brainmap entries, as well as method or constructor parameters, can be annotated.
+These annotations should use <code class="language-plaintext highlighter-rouge">@</code> for annotations which ought to be runtime-visible,
+and <code class="language-plaintext highlighter-rouge">@?</code> for annotations which should be in the class file but invisible at runtime.
+Annotations may optionally take a comma-separated list of name-value pairs, with
+values of the following forms:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Type</th>
+      <th style="text-align: left">Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">int</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">1</code> or <code class="language-plaintext highlighter-rouge">1i</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">short</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">3s</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">byte</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">4b</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">char</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">'a'</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">long</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-2l</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">float</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">3.5f</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">double</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">2.0</code> or <code class="language-plaintext highlighter-rouge">2.0d</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">String</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">"Hello, world!"</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Class</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">java.lang.Object</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Enum Value</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">fully.qualified.EnumName#ENUM_VALUE</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Annotation</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">@fully.qualified.AnnotationName...</code> (same as the outer notation)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Array</td>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">{1,2,3}</code> (Can be of any of the types above, though not a nested array)</td>
+    </tr>
+  </tbody>
+</table>
+
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        
+        <p class="copyright">brainfrick maintained by <a href="https://github.com/lukebemish">lukebemish</a></p>
+        
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
+

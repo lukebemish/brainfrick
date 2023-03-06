@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,maximum-scale=2">
+    <link rel="stylesheet" type="text/css" media="screen" href="/brainfrick/assets/css/style.css?v=e0a66726c7b4786c4b4a0fe44a7d7a8e3cc943c0">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>What is brainfrick? | brainfrick</title>
+<meta name="generator" content="Jekyll v3.9.2" />
+<meta property="og:title" content="What is brainfrick?" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A slightly-modified brainfuck that compiles to JVM bytecode" />
+<meta property="og:description" content="A slightly-modified brainfuck that compiles to JVM bytecode" />
+<link rel="canonical" href="http://lukebemish.dev/brainfrick/" />
+<meta property="og:url" content="http://lukebemish.dev/brainfrick/" />
+<meta property="og:site_name" content="brainfrick" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="What is brainfrick?" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"A slightly-modified brainfuck that compiles to JVM bytecode","headline":"What is brainfrick?","name":"brainfrick","url":"http://lukebemish.dev/brainfrick/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/brainfrick/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+    <nav class="site-nav">
+    <div><a href="/brainfrick/" alt="About">About</a><a href="/brainfrick/spec/brainmap" alt="Brainmaps">Brainmaps</a><a href="/brainfrick/javadoc/runtime" alt="Javadoc">Javadoc</a></div>
+  </nav>
+    
+        <header class="inner">
+          
+            <a id="forkme_banner" href="https://github.com/lukebemish/brainfrick">View on GitHub</a>
+          
+
+          <h1 id="project_title">brainfrick</h1>
+          <h2 id="project_tagline">A slightly-modified brainfuck that compiles to JVM bytecode</h2>
+
+          
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2 id="what-is-brainfrick">What is brainfrick?</h2>
+
+<p>Brainfrick is an extension of Brainfuck, an esoteric programming language based on only 8 different instructions; two to move a pointer, one each to increment or decrement the value at the pointer, two that allow for control flow, and one each for pulling input and pushing output. Brainfrick’s extensions allow it to be be compiled for and run on the JVM; it extends brainfuck’s simple syntax with a minimal set of instructions and syntax necessary for interacting with classes.</p>
+
+<h2 id="using">Using</h2>
+
+<p><a href="https://search.maven.org/artifact/io.github.lukebemish.brainfrick/brainfrick-runtime"><img src="https://img.shields.io/maven-central/v/io.github.lukebemish.brainfrick/brainfrick-runtime?style=for-the-badge" alt="Maven Central" /></a>
+<a href="https://plugins.gradle.org/plugin/io.github.lukebemish.brainfrick"><img src="https://img.shields.io/gradle-plugin-portal/v/io.github.lukebemish.brainfrick?style=for-the-badge" alt="Gradle Plugin Portal" /></a></p>
+
+<p>Brainfrick provides a gradle plugin for compiling brainfrick code, and the runtime libraries are available on maven central. To use, apply the plugin and add the runtime libraries as a dependency:</p>
+
+<div class="language-gradle highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plugins</span> <span class="o">{</span>
+    <span class="n">id</span> <span class="s1">'io.github.lukebemish.brainfrick'</span> <span class="n">version</span> <span class="s1">'&lt;plugin-version&gt;'</span>
+<span class="o">}</span>
+
+<span class="k">repositories</span> <span class="o">{</span>
+    <span class="n">mavenCentral</span><span class="o">()</span>
+<span class="o">}</span>
+
+<span class="k">dependencies</span> <span class="o">{</span>
+    <span class="n">implementation</span> <span class="s1">'io.github.lukebemish.brainfrick:brainfrick-runtime:&lt;version&gt;'</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Brainfrick code can be written in <code class="language-plaintext highlighter-rouge">.frick</code> files inside of the <code class="language-plaintext highlighter-rouge">brainfrick</code> folder within a source set: for instance, <code class="language-plaintext highlighter-rouge">src/main/brainfrick/helloWorld.frick</code>. Brainmaps are referenced from <code class="language-plaintext highlighter-rouge">.frick</code> files by relative path, and should have the <code class="language-plaintext highlighter-rouge">.map</code> extension.</p>
+
+<h2 id="syntax">Syntax</h2>
+
+<p>To allow references to JVM classes and methods within a brainfuck-like environment, brainfrick requires the user to define any number of <code class="language-plaintext highlighter-rouge">brainmaps</code>.
+These are ordered lists of classes, methods, and field getters or setters. They take a form such as shown below:</p>
+<div class="language-brainmap highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// At index 0, we define a class</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="na">brainfrick.test.TestFunction</span> <span class="kd">implements</span> <span class="na">java.util.function.Function</span>
+    <span class="c1">// At index 1, we define a method on that class.</span>
+    <span class="kd">public</span> <span class="na">java.lang.Object</span> <span class="nf">apply</span><span class="o">(</span><span class="na">java.lang.Object</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="k">new</span><span class="o">()</span> <span class="o">-&gt;</span> <span class="na">java.lang.Object</span> <span class="k">new</span><span class="o">()</span>
+<span class="c1">// We can also reference classes we won't be defining</span>
+<span class="kd">class</span> <span class="na">java.lang.Object</span>
+<span class="kd">abstract</span> <span class="kd">public</span> <span class="kd">class</span> <span class="na">brainfrick.test.TestField</span>
+    <span class="kd">get</span> <span class="na">java.lang.Object</span> <span class="no">storedObject</span>
+    <span class="kd">static</span> <span class="kd">get</span> <span class="na">java.lang.String</span> <span class="no">staticString</span>
+    <span class="kd">put</span> <span class="na">java.lang.Object</span> <span class="no">storedObject</span>
+    <span class="kd">abstract</span> <span class="na">java.lang.Object</span> <span class="nf">someMethod</span><span class="o">()</span>
+</code></pre></div></div>
+
+<p>More details on brainmap syntax can be found at the <a href="/brainfrick/spec/brainmap">brainmap specification</a>.
+Brainmaps are referenced at the beginning of a brainfrick source file, and are integrated
+into classes at compile time. For instance, if the previous map was saved as <code class="language-plaintext highlighter-rouge">brainmap.map</code>,
+a corresponding brainfrick source file might be:</p>
+
+<div class="language-brainfrick highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Brainmaps to use are declared before anything else. Any number can be declared; they will
+// be appended together at compile time.
+</span><span class="s">"brainmap.map"</span><span class="c1">
+// This syntax opens a class definition - in this case, the class at index 0
+</span><span class="p">;{</span><span class="c1">
+    // And this opens up a method definition
+    </span><span class="p">;{</span><span class="c1">
+        // Your code implementing "apply" would go here
+    </span><span class="p">}</span><span class="c1">
+    // Methods and constructors are declared the same way
+    </span><span class="p">;{</span><span class="c1">
+        </span><span class="nf">;</span><span class="c1">
+    </span><span class="p">}</span><span class="c1">
+    </span><span class="p">{</span><span class="c1">
+        // Static blocks can be defined like so. Returning early from one static block returns early from
+        // all future ones as well.
+    </span><span class="p">}</span><span class="c1">
+</span><span class="p">}</span><span class="c1">
+// A "-" tells the compiler to skip this class or method - in this case, we don't want to redefine Object!
+</span><span class="p">-</span><span class="c1">
+</span><span class="p">;{</span><span class="c1">
+    // A ";" on its own for a method definition defines, but skips, an abstract method.
+    </span><span class="p">;</span><span class="c1">
+</span><span class="p">}</span><span class="c1">
+</span></code></pre></div></div>
+
+<p>The code itself is an extended version of normal brainfuck syntax:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Command</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&gt;</code></td>
+      <td style="text-align: left">Moves the pointer one to the right. Pointer locations can be any integer value.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">&lt;</code></td>
+      <td style="text-align: left">Moves the pointer one to the left</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">+</code></td>
+      <td style="text-align: left">Increments the pointed to location by one. Numbers will be increased by one, <code class="language-plaintext highlighter-rouge">null</code> will become <code class="language-plaintext highlighter-rouge">1</code>, <code class="language-plaintext highlighter-rouge">false</code> will become <code class="language-plaintext highlighter-rouge">true</code>, and objects that implement <code class="language-plaintext highlighter-rouge">Incrementable</code> will be incremented.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">-</code></td>
+      <td style="text-align: left">Decrements the pointed to location by one. Numbers will be decreased by one, <code class="language-plaintext highlighter-rouge">null</code> will become <code class="language-plaintext highlighter-rouge">-1</code>, <code class="language-plaintext highlighter-rouge">true</code> will become <code class="language-plaintext highlighter-rouge">false</code>, and objects that implement <code class="language-plaintext highlighter-rouge">Decrementable</code> will be decremented.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">[</code></td>
+      <td style="text-align: left">If the value at the pointer is zero-like (zero, <code class="language-plaintext highlighter-rouge">false</code>, <code class="language-plaintext highlighter-rouge">null</code>, or a <code class="language-plaintext highlighter-rouge">Zeroable</code> where <code class="language-plaintext highlighter-rouge">isZero</code> is true), jumps to after the matching <code class="language-plaintext highlighter-rouge">]</code> instruction.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">]</code></td>
+      <td style="text-align: left">If the value at the pointer is not zero-like, jumps to after the matching <code class="language-plaintext highlighter-rouge">[</code> instruction.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">,</code></td>
+      <td style="text-align: left">Using the value at the pointer as an index, gets an argument of the method and fills the pointed cell with it.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">.</code></td>
+      <td style="text-align: left">Pushes the value at the pointed cell to the buffer.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">/</code></td>
+      <td style="text-align: left">Returns the method early; for non-<code class="language-plaintext highlighter-rouge">void</code> methods, whether returned early or at the end of execution, the top value of the buffer will be returned. Methods that return <code class="language-plaintext highlighter-rouge">String</code> will return the top value if it is a <code class="language-plaintext highlighter-rouge">String</code> or <code class="language-plaintext highlighter-rouge">null</code>, and use the whole buffer to construct a <code class="language-plaintext highlighter-rouge">char</code> array and then a <code class="language-plaintext highlighter-rouge">String</code> otherwise.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">:</code></td>
+      <td style="text-align: left">Using the value at the pointer as an index, invokes the corresponding value from the declared brainmaps using the top of the buffer as arguments, if necessary. The cell is set to:<br><ul><li>The corresponding <code>Class</code> object, if the index corresponds to a class. <li>The returned object, if the index is a non-<code>void</code> method, constructor, or field getter. <li><code>null</code>, if the index is a <code>void</code> method or field putter.</ul></td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">;</code></td>
+      <td style="text-align: left">Invokes the super method or constructor for this method using the top of the buffer. Will always be called at least one in constructors; in constructors, the <code class="language-plaintext highlighter-rouge">this</code> argument will not be consumed, but is necessary in methods.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>All cells start out with a value of <code class="language-plaintext highlighter-rouge">null</code>. All characters other than those with specific meanings are ignored; however, it is recommended to use comments for other non-alphanumeric characters, in case the syntax ever has to be expanded further. Single-line and multi-line comments work the same as in java, with <code class="language-plaintext highlighter-rouge">//</code> and <code class="language-plaintext highlighter-rouge">/* ... */</code> respectively.</p>
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        
+        <p class="copyright">brainfrick maintained by <a href="https://github.com/lukebemish">lukebemish</a></p>
+        
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
+
